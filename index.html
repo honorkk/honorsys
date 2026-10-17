@@ -14,14 +14,14 @@
             <h1 class="text-xl font-bold flex items-center gap-2">
                 🖥️ 內部電腦設備報修與管理系統
             </h1>
-            <!-- 登入前 -->
+            <!-- 未登入狀態 (預設身分：一般使用者) -->
             <div id="navAuthArea" class="flex items-center gap-3">
-                <span class="text-sm text-blue-200">目前身分：一般使用者</span>
+                <span id="currentRoleBadge" class="text-sm text-blue-200">目前身分：一般使用者</span>
                 <button onclick="openLoginModal()" class="bg-blue-700 hover:bg-blue-600 px-3 py-1.5 rounded text-sm transition">
-                    🔐 工程師 / 管理員登入
+                    🔐 帳號登入 (工程師/管理員)
                 </button>
             </div>
-            <!-- 登入後 -->
+            <!-- 已登入狀態 (工程師或管理員) -->
             <div id="navLogoutArea" class="hidden flex items-center gap-3">
                 <span id="loggedInName" class="text-sm text-green-300 font-semibold"></span>
                 <button onclick="openChangePwdModal()" class="bg-blue-700 hover:bg-blue-600 px-3 py-1.5 rounded text-sm transition">
@@ -79,20 +79,18 @@
                     <span>🚨 未處理急件快速查看區</span>
                     <span class="text-xs font-normal text-gray-500">最新填寫尚未處理之單號</span>
                 </h3>
-                <div id="dashboardPendingList" class="space-y-2 max-h-60 overflow-y-auto">
-                    <!-- 動態載入未處理案件 -->
-                </div>
+                <div id="dashboardPendingList" class="space-y-2 max-h-60 overflow-y-auto"></div>
             </div>
         </section>
 
-        <!-- 1. 我要報修表單 (一般使用者可填寫) -->
+        <!-- 1. 我要報修表單 -->
         <section id="section-submit" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 max-w-2xl mx-auto">
             <h2 class="text-lg font-bold mb-4 text-gray-700 border-b pb-2">填寫設備報修單</h2>
             <form id="repairForm" onsubmit="handleRepairSubmit(event)" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">報修人姓名</label>
-                        <input type="text" id="userName" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="例如：王小明">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">報修人姓名 <span class="text-red-500">*</span></label>
+                        <input type="text" id="userName" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="例如：王小明（2~5字中文）">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">所屬科室</label>
@@ -115,7 +113,6 @@
         <section id="section-list" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hidden">
             <div class="flex flex-wrap justify-between items-center mb-4 border-b pb-2 gap-2">
                 <h2 class="text-lg font-bold text-gray-700">報修案件總覽</h2>
-                <!-- 篩選下拉選單 -->
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-600">依狀態篩選：</span>
                     <select id="statusFilter" onchange="renderRepairs()" class="border rounded px-2 py-1 text-sm bg-gray-50 focus:outline-none">
@@ -146,8 +143,9 @@
 
         <!-- 3. 系統與人員管理 (僅管理員解鎖) -->
         <section id="section-admin" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hidden">
-            <h2 class="text-lg font-bold mb-4 text-gray-700 border-b pb-2">系統設定與人員清單管理</h2>
+            <h2 class="text-lg font-bold mb-4 text-gray-700 border-b pb-2">⚙️ 系統設定與帳號密碼維護</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 科室管理 -->
                 <div class="border p-4 rounded-lg bg-gray-50">
                     <h3 class="font-semibold text-gray-700 mb-3">🏢 管理科室清單</h3>
                     <div class="flex gap-2 mb-3">
@@ -156,37 +154,49 @@
                     </div>
                     <ul id="deptList" class="space-y-2 max-h-48 overflow-y-auto"></ul>
                 </div>
+                <!-- 帳號編號與密碼管理 -->
                 <div class="border p-4 rounded-lg bg-gray-50">
-                    <h3 class="font-semibold text-gray-700 mb-3">👥 管理系統人員角色</h3>
-                    <div class="flex gap-2 mb-3">
-                        <input type="text" id="newStaffName" placeholder="姓名" class="w-1/2 border rounded px-3 py-1 text-sm">
-                        <select id="newStaffRole" class="w-1/3 border rounded px-3 py-1 text-sm">
-                            <option value="user">一般使用者</option>
-                            <option value="engineer">工程師</option>
-                            <option value="admin">管理員</option>
-                        </select>
-                        <button onclick="addStaff()" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">新增</button>
+                    <h3 class="font-semibold text-gray-700 mb-3">🔑 各身分登入編號與密碼設定</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="bg-white p-3 rounded border">
+                            <span class="font-bold text-blue-800 block mb-1">一般使用者 (User)</span>
+                            <div class="flex gap-2">
+                                <input type="text" id="adminEditUserLogin" placeholder="登入編號" class="w-1/2 border rounded px-2 py-1">
+                                <input type="text" id="adminEditUserPwd" placeholder="密碼" class="w-1/2 border rounded px-2 py-1">
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded border">
+                            <span class="font-bold text-amber-800 block mb-1">工程師 (Engineer)</span>
+                            <div class="flex gap-2">
+                                <input type="text" id="adminEditEngLogin" placeholder="登入編號" class="w-1/2 border rounded px-2 py-1">
+                                <input type="text" id="adminEditEngPwd" placeholder="密碼" class="w-1/2 border rounded px-2 py-1">
+                            </div>
+                        </div>
+                        <div class="bg-white p-3 rounded border">
+                            <span class="font-bold text-rose-800 block mb-1">管理員 (Admin)</span>
+                            <div class="flex gap-2">
+                                <input type="text" id="adminEditAdminLogin" placeholder="登入編號" class="w-1/2 border rounded px-2 py-1">
+                                <input type="text" id="adminEditAdminPwd" placeholder="密碼" class="w-1/2 border rounded px-2 py-1">
+                            </div>
+                        </div>
+                        <button onclick="saveAllAccounts()" class="w-full bg-blue-600 text-white py-2 rounded text-sm hover:bg-blue-700">儲存所有帳號密碼變更</button>
                     </div>
-                    <ul id="staffList" class="space-y-2 max-h-48 overflow-y-auto"></ul>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- 登入視窗 -->
+    <!-- 登入視窗 (改為編號 + 密碼) -->
     <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
         <div class="bg-white p-6 rounded-xl w-full max-w-sm shadow-lg">
-            <h3 class="text-lg font-bold mb-3 text-gray-700">工程師 / 管理員登入</h3>
+            <h3 class="text-lg font-bold mb-3 text-gray-700">🔐 系統登入驗證</h3>
             <div class="mb-3">
-                <label class="block text-sm text-gray-600 mb-1">選擇身分</label>
-                <select id="loginRole" class="w-full border rounded px-3 py-2 text-sm">
-                    <option value="engineer">工程師</option>
-                    <option value="admin">管理員</option>
-                </select>
+                <label class="block text-sm text-gray-600 mb-1">登入編號</label>
+                <input type="text" id="loginIdInput" class="w-full border rounded px-3 py-2 text-sm font-mono" placeholder="請輸入登入編號 (如: eng01)">
             </div>
             <div class="mb-4">
-                <label class="block text-sm text-gray-600 mb-1">安全密碼</label>
-                <input type="password" id="loginPassword" class="w-full border rounded px-3 py-2 text-sm" placeholder="預設密碼: 1234">
+                <label class="block text-sm text-gray-600 mb-1">登入密碼</label>
+                <input type="password" id="loginPassword" class="w-full border rounded px-3 py-2 text-sm" placeholder="請輸入密碼">
             </div>
             <div class="flex justify-end gap-2">
                 <button onclick="closeLoginModal()" class="bg-gray-300 px-4 py-2 rounded text-sm text-gray-700">取消</button>
@@ -246,17 +256,14 @@
 
         let currentRole = localStorage.getItem('currentRole') || 'user';
         
-        let passwords = JSON.parse(localStorage.getItem('passwords')) || {
-            engineer: '1234',
-            admin: '1234'
+        // 帳號密碼與編號結構設定 (預設值)
+        let accounts = JSON.parse(localStorage.getItem('system_accounts')) || {
+            user: { id: 'user01', pwd: 'user123' },
+            engineer: { id: 'eng01', pwd: '1234' },
+            admin: { id: 'admin01', pwd: '1234' }
         };
 
         let departments = JSON.parse(localStorage.getItem('departments')) || ['資訊室', '總務科', '政風室', '會計室', '業務一科'];
-        let staffList = JSON.parse(localStorage.getItem('staffList')) || [
-            { name: '王小明', role: 'user' },
-            { name: '陳工程師', role: 'engineer' },
-            { name: '林管理員', role: 'admin' }
-        ];
         let repairs = JSON.parse(localStorage.getItem('repairs')) || [
             { id: 'R000001', date: '2026-10-17 09:00', name: '張同仁', dept: '總務科', asset: 'PC-101', desc: '電腦開機無畫面嗶嗶叫', status: '待處理', processLog: '尚未檢修' },
             { id: 'R000002', date: '2026-10-17 10:15', name: '李組長', dept: '資訊室', asset: 'PRN-002', desc: '印表機卡紙夾紙嚴重', status: '處理中', processLog: '已拆解清理滾輪中' },
@@ -266,9 +273,9 @@
         window.onload = function() {
             updateUI();
             renderDepts();
-            renderStaff();
             renderRepairs();
             updateDashboard();
+            initAdminAccountInputs();
         };
 
         function updateUI() {
@@ -276,25 +283,25 @@
             const navLogout = document.getElementById('navLogoutArea');
             const dynamicTabs = document.getElementById('dynamicTabs');
             const loggedName = document.getElementById('loggedInName');
+            const roleBadge = document.getElementById('currentRoleBadge');
 
             if (currentRole === 'user') {
                 navAuth.classList.remove('hidden');
                 navLogout.classList.add('hidden');
-                dynamicTabs.innerHTML = ''; // 一般使用者看不見儀表板與管理員頁籤
+                roleBadge.innerText = "目前身分：一般使用者";
+                dynamicTabs.innerHTML = ''; 
                 switchTab('submit');
             } else if (currentRole === 'engineer') {
                 navAuth.classList.add('hidden');
                 navLogout.classList.remove('hidden');
-                loggedName.innerText = "身分：工程師";
-                // 工程師可看儀表板
+                loggedName.innerText = "身分：工程師 (" + accounts.engineer.id + ")";
                 dynamicTabs.innerHTML = `
                     <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-600">📊 數據儀表板</button>
                 `;
             } else if (currentRole === 'admin') {
                 navAuth.classList.add('hidden');
                 navLogout.classList.remove('hidden');
-                loggedName.innerText = "身分：管理員";
-                // 管理員可看儀表板 + 管理頁籤
+                loggedName.innerText = "身分：管理員 (" + accounts.admin.id + ")";
                 dynamicTabs.innerHTML = `
                     <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-600">📊 數據儀表板</button>
                     <button onclick="switchTab('admin')" id="tab-admin" class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-600">系統與人員管理</button>
@@ -304,22 +311,35 @@
             updateDashboard();
         }
 
-        function openLoginModal() { document.getElementById('loginModal').classList.remove('hidden'); }
+        function openLoginModal() { 
+            document.getElementById('loginIdInput').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginModal').classList.remove('hidden'); 
+        }
         function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
 
+        // 依據「編號 + 密碼」驗證身分
         function verifyLogin() {
-            const role = document.getElementById('loginRole').value;
-            const pwd = document.getElementById('loginPassword').value;
+            const inputId = document.getElementById('loginIdInput').value.trim();
+            const inputPwd = document.getElementById('loginPassword').value.trim();
 
-            if (pwd === passwords[role]) {
-                currentRole = role;
+            let matchedRole = null;
+            for (let role in accounts) {
+                if (accounts[role].id === inputId && accounts[role].pwd === inputPwd) {
+                    matchedRole = role;
+                    break;
+                }
+            }
+
+            if (matchedRole) {
+                currentRole = matchedRole;
                 localStorage.setItem('currentRole', currentRole);
                 closeLoginModal();
                 updateUI();
-                switchTab('dashboard'); // 登入後自動切換到儀表板
-                alert('登入成功！已進入工程師/管理員主控台。');
+                switchTab('dashboard'); 
+                alert('登入成功！歡迎進入主控台。');
             } else {
-                alert('密碼錯誤！');
+                alert('登入編號或密碼錯誤！');
             }
         }
 
@@ -327,7 +347,7 @@
             currentRole = 'user';
             localStorage.setItem('currentRole', 'user');
             updateUI();
-            alert('已登出');
+            alert('已安全登出');
         }
 
         function openChangePwdModal() { document.getElementById('changePwdModal').classList.remove('hidden'); }
@@ -341,7 +361,7 @@
             const oldPwd = document.getElementById('oldPassword').value;
             const newPwd = document.getElementById('newPassword').value;
 
-            if (oldPwd !== passwords[currentRole]) {
+            if (oldPwd !== accounts[currentRole].pwd) {
                 alert('舊密碼不正確！');
                 return;
             }
@@ -350,8 +370,8 @@
                 return;
             }
 
-            passwords[currentRole] = newPwd.trim();
-            localStorage.setItem('passwords', JSON.stringify(passwords));
+            accounts[currentRole].pwd = newPwd.trim();
+            localStorage.setItem('system_accounts', JSON.stringify(accounts));
             closeChangePwdModal();
             alert('密碼修改成功！');
         }
@@ -372,7 +392,6 @@
             if (activeBtn) activeBtn.className = "py-2 px-4 font-semibold text-blue-600 border-b-2 border-blue-600";
         }
 
-        // 更新數據儀表板內容
         function updateDashboard() {
             const pending = repairs.filter(r => r.status === '待處理');
             const processing = repairs.filter(r => r.status === '處理中');
@@ -383,7 +402,6 @@
             document.getElementById('countDone').innerText = done.length;
             document.getElementById('countTotal').innerText = repairs.length;
 
-            // 渲染急件快查
             const pendingListEl = document.getElementById('dashboardPendingList');
             if (pending.length === 0) {
                 pendingListEl.innerHTML = `<div class="text-sm text-gray-500 py-2">🎉 太棒了！目前沒有任何未處理案件。</div>`;
@@ -417,27 +435,44 @@
             `).join('');
         }
 
-        function renderStaff() {
-            document.getElementById('staffList').innerHTML = staffList.map((s, index) => `
-                <li class="flex justify-between items-center bg-white p-2 rounded border text-sm">
-                    <span>${s.name} (${s.role})</span>
-                    <button onclick="deleteStaff(${index})" class="text-red-500 text-xs">刪除</button>
-                </li>
-            `).join('');
+        // 初始化管理員面板的帳號編號與密碼欄位
+        function initAdminAccountInputs() {
+            if(document.getElementById('adminEditUserLogin')) {
+                document.getElementById('adminEditUserLogin').value = accounts.user.id;
+                document.getElementById('adminEditUserPwd').value = accounts.user.pwd;
+                document.getElementById('adminEditEngLogin').value = accounts.engineer.id;
+                document.getElementById('adminEditEngPwd').value = accounts.engineer.pwd;
+                document.getElementById('adminEditAdminLogin').value = accounts.admin.id;
+                document.getElementById('adminEditAdminPwd').value = accounts.admin.pwd;
+            }
+        }
+
+        // 管理員儲存所有帳號變更
+        function saveAllAccounts() {
+            accounts.user.id = document.getElementById('adminEditUserLogin').value.trim() || accounts.user.id;
+            accounts.user.pwd = document.getElementById('adminEditUserPwd').value.trim() || accounts.user.pwd;
+            
+            accounts.engineer.id = document.getElementById('adminEditEngLogin').value.trim() || accounts.engineer.id;
+            accounts.engineer.pwd = document.getElementById('adminEditEngPwd').value.trim() || accounts.engineer.pwd;
+            
+            accounts.admin.id = document.getElementById('adminEditAdminLogin').value.trim() || accounts.admin.id;
+            accounts.admin.pwd = document.getElementById('adminEditAdminPwd').value.trim() || accounts.admin.pwd;
+
+            localStorage.setItem('system_accounts', JSON.stringify(accounts));
+            alert('🎉 所有身分的登入編號與密碼已成功更新！');
         }
 
         async function handleRepairSubmit(e) {
-            e.preventDefault(); // 阻擋表單預設重新整理
+            e.preventDefault(); 
 
-            // 1. 取得姓名並進行嚴格防呆驗證
             const nameInput = document.getElementById('userName');
             const name = nameInput.value.trim();
             const chineseNameRegex = /^[\u4e00-\u9fa5]{2,5}$/;
 
             if (!chineseNameRegex.test(name)) {
-                alert('⚠️ 姓名格式錯誤：請輸入 2 至 5 個純中文字（不可包含英文、數字、空白或特殊符號）！');
-                nameInput.focus(); // 自動把游標拉回姓名欄位
-                return; // 🛑 徹底阻擋！絕對不准往下送出
+                alert('⚠️ 姓名格式錯誤：請輸入 2 至 5 個純中文字！');
+                nameInput.focus();
+                return; 
             }
 
             const submitBtn = document.getElementById('submitBtn');
@@ -482,14 +517,13 @@
             }
         }
 
-        // 🌟 狀態色彩判斷與清單繪製
         function renderRepairs() {
             const tbody = document.getElementById('repairTableBody');
             const filter = document.getElementById('statusFilter').value;
 
             let filteredRepairs = repairs;
             if (filter !== '全部') {
-                filteredRepairs = repairs.filter(r => r.status === filter);
+                filteredRepairs = repairs.filter(r => r.status === filter); 
             }
 
             if (filteredRepairs.length === 0) {
@@ -498,7 +532,6 @@
             }
 
             tbody.innerHTML = filteredRepairs.map(r => {
-                // 🔴 🟢 🟡 狀態顏色設定
                 let statusBadge = '';
                 if (r.status === '待處理') {
                     statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-300">🔴 待處理</span>`;
@@ -536,53 +569,50 @@
         }
         function closeProcessModal() { document.getElementById('processModal').classList.add('hidden'); }
 
-       async function saveRepairProcess() {
-    const id = document.getElementById('modalRepairId').value;
-    const status = document.getElementById('modalStatus').value;
-    const processLog = document.getElementById('modalProcessLog').value;
+        async function saveRepairProcess() {
+            const id = document.getElementById('modalRepairId').value;
+            const status = document.getElementById('modalStatus').value;
+            const processLog = document.getElementById('modalProcessLog').value;
 
-    const index = repairs.findIndex(r => r.id === id);
-    if (index !== -1) {
-        // 1. 先更新本地端資料
-        repairs[index].status = status;
-        repairs[index].processLog = processLog;
-        localStorage.setItem('repairs', JSON.stringify(repairs));
+            const index = repairs.findIndex(r => r.id === id);
+            if (index !== -1) {
+                repairs[index].status = status;
+                repairs[index].processLog = processLog;
+                localStorage.setItem('repairs', JSON.stringify(repairs));
 
-        // 2. 畫面上鎖並提示
-        const saveBtn = event.target;
-        const originalText = saveBtn.innerText;
-        saveBtn.innerText = "同步更新至試算表中...";
-        saveBtn.disabled = true;
+                const saveBtn = event.target;
+                const originalText = saveBtn.innerText;
+                saveBtn.innerText = "同步更新至試算表中...";
+                saveBtn.disabled = true;
 
-        try {
-            // 3. 發送更新請求給 Google Apps Script
-            if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'update',
-                        id: id,
-                        status: status,
-                        processLog: processLog
-                    })
-                });
+                try {
+                    if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
+                        await fetch(WEB_APP_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                action: 'update',
+                                id: id,
+                                status: status,
+                                processLog: processLog
+                            })
+                        });
+                    }
+
+                    alert('維修進度與狀態已成功更新！');
+                    closeProcessModal();
+                    renderRepairs();
+                    updateDashboard();
+                } catch (error) {
+                    console.error(error);
+                    alert('本地端已更新，但同步至 Google 試算表時發生錯誤。');
+                } finally {
+                    saveBtn.innerText = originalText;
+                    saveBtn.disabled = false;
+                }
             }
-
-            alert('維修進度與狀態已成功更新，並同步至 Google 試算表！');
-            closeProcessModal();
-            renderRepairs();
-            updateDashboard();
-        } catch (error) {
-            console.error(error);
-            alert('本地端已更新，但同步至 Google 試算表時發生錯誤，請檢查網路。');
-        } finally {
-            saveBtn.innerText = originalText;
-            saveBtn.disabled = false;
         }
-    }
-}
 
         function addDepartment() {
             const val = document.getElementById('newDeptInput').value.trim();
@@ -593,19 +623,11 @@
                 renderDepts();
             }
         }
-        function deleteDept(index) { departments.splice(index, 1); localStorage.setItem('departments', JSON.stringify(departments)); renderDepts(); }
-
-        function addStaff() {
-            const name = document.getElementById('newStaffName').value.trim();
-            const role = document.getElementById('newStaffRole').value;
-            if (name) {
-                staffList.push({ name, role });
-                localStorage.setItem('staffList', JSON.stringify(staffList));
-                document.getElementById('newStaffName').value = '';
-                renderStaff();
-            }
+        function deleteDept(index) { 
+            departments.splice(index, 1); 
+            localStorage.setItem('departments', JSON.stringify(departments)); 
+            renderDepts(); 
         }
-        function deleteStaff(index) { staffList.splice(index, 1); localStorage.setItem('staffList', JSON.stringify(staffList)); renderStaff(); }
     </script>
 </body>
 </html>
