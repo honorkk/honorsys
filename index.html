@@ -652,16 +652,36 @@
             }).join('');
         }
 
-        function deleteRepair(id) {
-            if (!confirm(`⚠️ 確定要永久刪除報修單 [${id}] 嗎？此動作無法復原！`)) return;
+        
+            async function deleteRepair(id) {
+    if (!confirm(`⚠️ 確定要永久刪除報修單 [${id}] 嗎？此動作將同步從 Google 試算表中刪除且無法復原！`)) return;
 
-            repairs = repairs.filter(r => r.id !== id);
-            localStorage.setItem('repairs', JSON.stringify(repairs));
-            
-            alert('已成功刪除該筆報修資料！');
-            renderRepairs();
-            updateDashboard();
+    try {
+        if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
+            await fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'delete',
+                    id: id
+                })
+            });
         }
+
+        // 從本地資料刪除並更新 UI
+        repairs = repairs.filter(r => r.id !== id);
+        localStorage.setItem('repairs', JSON.stringify(repairs));
+        
+        alert(`已成功刪除案件 [${id}] 並同步至雲端！`);
+        renderRepairs();
+        updateDashboard();
+    } catch (error) {
+        console.error(error);
+        alert('刪除失敗，請檢查網路連線。');
+    }
+}
+        
 
         function openProcessModal(id) {
             const repair = repairs.find(r => r.id === id);
