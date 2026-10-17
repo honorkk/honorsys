@@ -137,7 +137,7 @@
 
         <!-- 3. 系統與人員管理 (僅管理員解鎖) -->
         <section id="section-admin" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hidden">
-            <h2 class="text-lg font-bold mb-4 text-gray-700 border-b pb-2">⚙️ 系統設定與帳號密碼維護</h2>
+            <h2 class="text-lg font-bold mb-4 text-gray-700 border-b pb-2">⚙️ 系統設定與人員清單管理 (同步雲端)</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- 科室管理 -->
                 <div class="border p-4 rounded-lg bg-gray-50">
@@ -149,33 +149,23 @@
                     <ul id="deptList" class="space-y-2 max-h-48 overflow-y-auto"></ul>
                 </div>
 
-                <!-- 帳號與密碼維護 (新增與修改) -->
+                <!-- 系統人員與角色管理 (同步至 Google 試算表) -->
                 <div class="border p-4 rounded-lg bg-gray-50">
-                    <h3 class="font-semibold text-gray-700 mb-3">👥 系統三身分帳號與密碼設定</h3>
-                    <div class="space-y-3 text-sm">
-                        <div class="bg-white p-3 rounded border">
-                            <span class="font-bold text-blue-800 block mb-1">一般使用者 (User)</span>
-                            <div class="flex gap-2">
-                                <input type="text" id="adminUserLogin" placeholder="登入編號" class="w-1/2 border rounded px-2 py-1">
-                                <input type="text" id="adminUserPwd" placeholder="密碼" class="w-1/2 border rounded px-2 py-1">
-                            </div>
-                        </div>
-                        <div class="bg-white p-3 rounded border">
-                            <span class="font-bold text-amber-800 block mb-1">工程師 (Engineer)</span>
-                            <div class="flex gap-2">
-                                <input type="text" id="adminEngLogin" placeholder="登入編號" class="w-1/2 border rounded px-2 py-1">
-                                <input type="text" id="adminEngPwd" placeholder="密碼" class="w-1/2 border rounded px-2 py-1">
-                            </div>
-                        </div>
-                        <div class="bg-white p-3 rounded border">
-                            <span class="font-bold text-rose-800 block mb-1">管理員 (Admin)</span>
-                            <div class="flex gap-2">
-                                <input type="text" id="adminAdminLogin" placeholder="登入編號" class="w-1/2 border rounded px-2 py-1">
-                                <input type="text" id="adminAdminPwd" placeholder="密碼" class="w-1/2 border rounded px-2 py-1">
-                            </div>
-                        </div>
-                        <button onclick="saveAllAccounts()" class="w-full bg-blue-600 text-white py-2 rounded text-sm hover:bg-blue-700">儲存所有帳號變更</button>
+                    <h3 class="font-semibold text-gray-700 mb-3">👥 新增/新增人員角色至雲端</h3>
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="newStaffName" placeholder="姓名 / 稱謂" class="w-1/3 border rounded px-3 py-1 text-sm">
+                        <input type="text" id="newStaffId" placeholder="登入編號" class="w-1/3 border rounded px-3 py-1 text-sm font-mono">
+                        <select id="newStaffRole" class="w-1/3 border rounded px-3 py-1 text-sm">
+                            <option value="user">一般使用者</option>
+                            <option value="engineer">工程師</option>
+                            <option value="admin">管理員</option>
+                        </select>
                     </div>
+                    <div class="mb-3">
+                        <input type="text" id="newStaffPwd" placeholder="設定登入密碼" class="w-full border rounded px-3 py-1 text-sm">
+                    </div>
+                    <button onclick="addStaffToCloud()" id="addStaffBtn" class="w-full bg-green-600 text-white py-1.5 rounded text-sm hover:bg-green-700 mb-3">同步儲存人員至雲端試算表</button>
+                    <ul id="staffList" class="space-y-2 max-h-48 overflow-y-auto"></ul>
                 </div>
             </div>
         </section>
@@ -187,7 +177,7 @@
             <h3 class="text-lg font-bold mb-3 text-gray-700">🔐 系統登入驗證</h3>
             <div class="mb-3">
                 <label class="block text-sm text-gray-600 mb-1">登入編號</label>
-                <input type="text" id="loginIdInput" class="w-full border rounded px-3 py-2 text-sm font-mono" placeholder="請輸入編號 (如: user01)">
+                <input type="text" id="loginIdInput" class="w-full border rounded px-3 py-2 text-sm font-mono" placeholder="請輸入編號 (如: eng01)">
             </div>
             <div class="mb-4">
                 <label class="block text-sm text-gray-600 mb-1">登入密碼</label>
@@ -195,7 +185,7 @@
             </div>
             <div class="flex justify-end gap-2">
                 <button onclick="closeLoginModal()" class="bg-gray-300 px-4 py-2 rounded text-sm text-gray-700">取消</button>
-                <button onclick="verifyLogin()" class="bg-blue-600 px-4 py-2 rounded text-sm text-white">確認登入</button>
+                <button onclick="verifyLogin()" id="loginBtn" class="bg-blue-600 px-4 py-2 rounded text-sm text-white">確認登入</button>
             </div>
         </div>
     </div>
@@ -214,7 +204,7 @@
             </div>
             <div class="flex justify-end gap-2">
                 <button onclick="closeChangePwdModal()" class="bg-gray-300 px-4 py-2 rounded text-sm text-gray-700">取消</button>
-                <button onclick="saveNewPassword()" class="bg-blue-600 px-4 py-2 rounded text-sm text-white">儲存新密碼</button>
+                <button onclick="saveNewPasswordCloud()" id="changePwdBtn" class="bg-blue-600 px-4 py-2 rounded text-sm text-white">儲存新密碼至雲端</button>
             </div>
         </div>
     </div>
@@ -249,28 +239,45 @@
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwSgZhHQqwUbgFMnbTi8cycIn08xbsnCNUOoQdgfVn_E6YAZCQIdgTiNUo6IulAhB4HoQ/exec';
 
         let currentRole = localStorage.getItem('currentRole') || 'user';
-        
-        // 帳號編號與密碼資料結構
-        let accounts = JSON.parse(localStorage.getItem('system_accounts')) || {
-            user: { id: 'user01', pwd: 'user123' },
-            engineer: { id: 'eng01', pwd: '1234' },
-            admin: { id: 'admin01', pwd: '1234' }
-        };
+        let currentUserId = localStorage.getItem('currentUserId') || '';
 
+        // 雲端帳號清單與報修紀錄
+        let staffList = [];
         let departments = JSON.parse(localStorage.getItem('departments')) || ['資訊室', '總務科', '政風室', '會計室', '業務一科'];
-        let repairs = JSON.parse(localStorage.getItem('repairs')) || [
-            { id: 'R000001', date: '2026-10-17 09:00', name: '張同仁', dept: '總務科', asset: 'PC-101', desc: '電腦開機無畫面嗶嗶叫', status: '待處理', processLog: '尚未檢修' },
-            { id: 'R000002', date: '2026-10-17 10:15', name: '李組長', dept: '資訊室', asset: 'PRN-002', desc: '印表機卡紙夾紙嚴重', status: '處理中', processLog: '已拆解清理滾輪中' },
-            { id: 'R000003', date: '2026-10-16 15:30', name: '陳科員', dept: '會計室', asset: 'PC-205', desc: '網路斷線無法存取系統', status: '已完修', processLog: '重新佈設網路線並更換網路孔' }
-        ];
+        let repairs = JSON.parse(localStorage.getItem('repairs')) || [];
 
-        window.onload = function() {
+        window.onload = async function() {
+            await fetchAccountsFromCloud(); // 開網頁時先抓雲端最新帳號
             updateUI();
             renderDepts();
             renderRepairs();
             updateDashboard();
-            initAdminAccountInputs();
         };
+
+        // 🌟 1. 從 Google 試算表（Accounts 分頁）獲取帳號清單
+        async function fetchAccountsFromCloud() {
+            try {
+                if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
+                    const res = await fetch(`${WEB_APP_URL}?action=getAccounts`);
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        staffList = data;
+                    }
+                }
+            } catch (e) {
+                console.error("無法連線至雲端帳號資料，使用備份帳號：", e);
+            }
+
+            // 備份預設帳號（若雲端連線失敗時防呆）
+            if (staffList.length === 0) {
+                staffList = [
+                    { name: '王小明', id: 'user01', pwd: 'user123', role: 'user' },
+                    { name: '陳工程師', id: 'eng01', pwd: '1234', role: 'engineer' },
+                    { name: '林管理員', id: 'admin01', pwd: '1234', role: 'admin' }
+                ];
+            }
+            renderStaff();
+        }
 
         function updateUI() {
             const navAuth = document.getElementById('navAuthArea');
@@ -288,14 +295,14 @@
             } else if (currentRole === 'engineer') {
                 navAuth.classList.add('hidden');
                 navLogout.classList.remove('hidden');
-                loggedName.innerText = "身分：工程師 (" + accounts.engineer.id + ")";
+                loggedName.innerText = `身分：工程師 (${currentUserId || 'eng01'})`;
                 dynamicTabs.innerHTML = `
                     <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-600">📊 數據儀表板</button>
                 `;
             } else if (currentRole === 'admin') {
                 navAuth.classList.add('hidden');
                 navLogout.classList.remove('hidden');
-                loggedName.innerText = "身分：管理員 (" + accounts.admin.id + ")";
+                loggedName.innerText = `身分：管理員 (${currentUserId || 'admin01'})`;
                 dynamicTabs.innerHTML = `
                     <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-600">📊 數據儀表板</button>
                     <button onclick="switchTab('admin')" id="tab-admin" class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-600">系統與人員管理</button>
@@ -312,33 +319,41 @@
         }
         function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
 
-        function verifyLogin() {
+        // 🌟 2. 登入比對雲端帳號
+        async function verifyLogin() {
             const inputId = document.getElementById('loginIdInput').value.trim();
             const inputPwd = document.getElementById('loginPassword').value.trim();
+            const loginBtn = document.getElementById('loginBtn');
 
-            let matchedRole = null;
-            for (let role in accounts) {
-                if (accounts[role].id === inputId && accounts[role].pwd === inputPwd) {
-                    matchedRole = role;
-                    break;
-                }
-            }
+            loginBtn.innerText = "驗證中...";
+            loginBtn.disabled = true;
 
-            if (matchedRole) {
-                currentRole = matchedRole;
+            await fetchAccountsFromCloud(); // 比對前重新抓一次試算表最新帳號
+
+            const matchedStaff = staffList.find(s => s.id === inputId && String(s.pwd) === inputPwd);
+
+            if (matchedStaff) {
+                currentRole = matchedStaff.role;
+                currentUserId = matchedStaff.id;
                 localStorage.setItem('currentRole', currentRole);
+                localStorage.setItem('currentUserId', currentUserId);
                 closeLoginModal();
                 updateUI();
                 switchTab('dashboard'); 
-                alert('登入成功！');
+                alert(`登入成功！歡迎 ${matchedStaff.name}。`);
             } else {
                 alert('登入編號或密碼錯誤！');
             }
+
+            loginBtn.innerText = "確認登入";
+            loginBtn.disabled = false;
         }
 
         function logout() {
             currentRole = 'user';
+            currentUserId = '';
             localStorage.setItem('currentRole', 'user');
+            localStorage.removeItem('currentUserId');
             updateUI();
             alert('已登出');
         }
@@ -350,11 +365,14 @@
             document.getElementById('newPassword').value = '';
         }
 
-        function saveNewPassword() {
+        // 🌟 3. 修改密碼同步回 Google 試算表
+        async function saveNewPasswordCloud() {
             const oldPwd = document.getElementById('oldPassword').value;
             const newPwd = document.getElementById('newPassword').value;
+            const changeBtn = document.getElementById('changePwdBtn');
 
-            if (oldPwd !== accounts[currentRole].pwd) {
+            const staff = staffList.find(s => s.id === currentUserId);
+            if (!staff || String(staff.pwd) !== oldPwd) {
                 alert('舊密碼不正確！');
                 return;
             }
@@ -363,10 +381,32 @@
                 return;
             }
 
-            accounts[currentRole].pwd = newPwd.trim();
-            localStorage.setItem('system_accounts', JSON.stringify(accounts));
-            closeChangePwdModal();
-            alert('密碼修改成功！');
+            changeBtn.innerText = "寫入雲端中...";
+            changeBtn.disabled = true;
+
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'saveAccount',
+                        name: staff.name,
+                        id: staff.id,
+                        pwd: newPwd.trim(),
+                        role: staff.role
+                    })
+                });
+
+                staff.pwd = newPwd.trim();
+                alert('🎉 密碼已成功更新並同步至 Google 試算表！');
+                closeChangePwdModal();
+            } catch (e) {
+                alert('更新失敗，請檢查網路。');
+            } finally {
+                changeBtn.innerText = "儲存新密碼至雲端";
+                changeBtn.disabled = false;
+            }
         }
 
         function switchTab(tabName) {
@@ -428,27 +468,66 @@
             `).join('');
         }
 
-        function initAdminAccountInputs() {
-            if(document.getElementById('adminUserLogin')) {
-                document.getElementById('adminUserLogin').value = accounts.user.id;
-                document.getElementById('adminUserPwd').value = accounts.user.pwd;
-                document.getElementById('adminEngLogin').value = accounts.engineer.id;
-                document.getElementById('adminEngPwd').value = accounts.engineer.pwd;
-                document.getElementById('adminAdminLogin').value = accounts.admin.id;
-                document.getElementById('adminAdminPwd').value = accounts.admin.pwd;
-            }
+        function renderStaff() {
+            const staffListEl = document.getElementById('staffList');
+            if (!staffListEl) return;
+            staffListEl.innerHTML = staffList.map((s) => {
+                let roleName = s.role === 'admin' ? '管理員' : s.role === 'engineer' ? '工程師' : '一般使用者';
+                let roleColor = s.role === 'admin' ? 'text-rose-600' : s.role === 'engineer' ? 'text-amber-600' : 'text-blue-600';
+                return `
+                    <li class="flex justify-between items-center bg-white p-2 rounded border text-sm">
+                        <div>
+                            <span class="font-bold">${s.name}</span> 
+                            <span class="font-mono text-xs text-gray-500">(${s.id})</span>
+                            <span class="text-xs font-semibold ${roleColor} ml-1">[${roleName}]</span>
+                        </div>
+                    </li>
+                `;
+            }).join('');
         }
 
-        function saveAllAccounts() {
-            accounts.user.id = document.getElementById('adminUserLogin').value.trim() || accounts.user.id;
-            accounts.user.pwd = document.getElementById('adminUserPwd').value.trim() || accounts.user.pwd;
-            accounts.engineer.id = document.getElementById('adminEngLogin').value.trim() || accounts.engineer.id;
-            accounts.engineer.pwd = document.getElementById('adminEngPwd').value.trim() || accounts.engineer.pwd;
-            accounts.admin.id = document.getElementById('adminAdminLogin').value.trim() || accounts.admin.id;
-            accounts.admin.pwd = document.getElementById('adminAdminPwd').value.trim() || accounts.admin.pwd;
+        // 🌟 4. 管理員新增人員，同步至 Google 試算表 Accounts 分頁
+        async function addStaffToCloud() {
+            const name = document.getElementById('newStaffName').value.trim();
+            const id = document.getElementById('newStaffId').value.trim();
+            const pwd = document.getElementById('newStaffPwd').value.trim();
+            const role = document.getElementById('newStaffRole').value;
+            const addBtn = document.getElementById('addStaffBtn');
 
-            localStorage.setItem('system_accounts', JSON.stringify(accounts));
-            alert('🎉 系統帳號與密碼已成功更新！');
+            if (!name || !id || !pwd) {
+                alert('請完整填寫姓名、登入編號與密碼！');
+                return;
+            }
+
+            addBtn.innerText = "正在儲存至 Google 試算表...";
+            addBtn.disabled = true;
+
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'saveAccount',
+                        name: name,
+                        id: id,
+                        pwd: pwd,
+                        role: role
+                    })
+                });
+
+                document.getElementById('newStaffName').value = '';
+                document.getElementById('newStaffId').value = '';
+                document.getElementById('newStaffPwd').value = '';
+                
+                alert('🎉 新人員帳號已成功儲存至 Google 試算表雲端！');
+                await fetchAccountsFromCloud();
+            } catch (e) {
+                alert('儲存失敗，請確認網路連線。');
+            } finally {
+                addBtn.innerText = "同步儲存人員至雲端試算表";
+                addBtn.disabled = false;
+            }
         }
 
         async function handleRepairSubmit(e) {
@@ -531,7 +610,6 @@
                     statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700 border border-gray-300">${r.status}</span>`;
                 }
 
-                // 🌟 根據身分動態產生操作按鈕 (管理員多出「刪除」按鈕)
                 let actionButtons = '';
                 if (currentRole === 'engineer') {
                     actionButtons = `<button onclick="openProcessModal('${r.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition">處理/更新</button>`;
@@ -560,7 +638,6 @@
             }).join('');
         }
 
-        // 🌟 管理員專屬：刪除單筆資料功能
         function deleteRepair(id) {
             if (!confirm(`⚠️ 確定要永久刪除報修單 [${id}] 嗎？此動作無法復原！`)) return;
 
