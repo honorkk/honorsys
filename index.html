@@ -171,7 +171,7 @@
             </div>
         </section>
 
-        <!-- 3. 系統與人員管理 -->
+        <!-- 3. 系統與人員管理 (支援刪除人員) -->
         <section id="section-admin" class="pro-card p-8 sm:p-10 rounded-3xl border border-slate-300/90 hidden">
             <h2 class="text-2xl font-black mb-6 text-slate-900 border-b border-slate-300/80 pb-4">⚙️ 系統設定與人員清單管理 (同步雲端)</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -283,11 +283,11 @@
         let departments = JSON.parse(localStorage.getItem('departments')) || ['資訊室', '總務科', '政風室', '會計室', '業務一科'];
         let repairs = JSON.parse(localStorage.getItem('repairs')) || [];
 
-        // 🛡️ 安全機制：閒置超時自動登出設定 (預設 5 分鐘)
+        // 🛡️ 閒置超時自動登出設定 (5 分鐘)
         const INACTIVITY_TIMEOUT = 5 * 60 * 1000;
         let inactivityTimer;
 
-        // 🛡️ 安全機制：登入失敗記錄與 IP 防護
+        // 🛡️ 登入失敗記錄與 IP 防護
         let loginFailedAttempts = 0;
         let isLoginLocked = false;
 
@@ -356,7 +356,6 @@
             }
         }
 
-        // 🛡️ 獲取訪問者 IP 地址
         async function getClientIP() {
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
@@ -367,7 +366,6 @@
             }
         }
 
-        // 🛡️ 上傳異常登入安全日誌至 Google 試算表
         async function logSecurityAlert(attemptedId, userIp) {
             if (!WEB_APP_URL || WEB_APP_URL.includes('你的部署ID')) return;
             try {
@@ -450,7 +448,7 @@
             const matchedStaff = staffList.find(s => s.id === inputId && String(s.pwd) === inputPwd);
 
             if (matchedStaff) {
-                loginFailedAttempts = 0; // 重置失敗計數
+                loginFailedAttempts = 0;
                 currentRole = matchedStaff.role;
                 currentUserId = matchedStaff.id;
                 localStorage.setItem('currentRole', currentRole);
@@ -462,20 +460,13 @@
                 alert(`登入成功！歡迎 ${matchedStaff.name}。`);
             } else {
                 loginFailedAttempts++;
-                
                 if (loginFailedAttempts >= 3) {
                     isLoginLocked = true;
                     loginBtn.innerText = "已被鎖定";
-                    
-                    // 抓取 IP 並回報至 Google 試算表
                     const userIp = await getClientIP();
                     await logSecurityAlert(inputId || '未知帳號', userIp);
-
                     alert(`🚨 安全警報：連續登入失敗 3 次！\n系統已記錄您的 IP 地址 [${userIp}] 並回報至管理員。\n登入功能已暫時鎖定 3 分鐘。`);
-                    
                     closeLoginModal();
-                    
-                    // 3 分鐘後自動解鎖
                     setTimeout(() => {
                         isLoginLocked = false;
                         loginFailedAttempts = 0;
@@ -620,6 +611,7 @@
             `).join('');
         }
 
+        // 👥 渲染人員清單（包含移除按鈕）
         function renderStaff() {
             const staffListEl = document.getElementById('staffList');
             if (!staffListEl) return;
@@ -633,9 +625,42 @@
                             <span class="font-mono text-sm text-slate-500">(${s.id})</span>
                             <span class="text-sm font-black ${roleColor} ml-1">[${roleName}]</span>
                         </div>
+                        <button onclick="deleteStaffFromCloud('${s.id}', '${s.name}')" class="text-rose-600 hover:text-rose-800 text-sm font-bold border border-rose-200 px-2.5 py-1 rounded-lg hover:bg-rose-50 transition">
+                            🗑️ 移除
+                        </button>
                     </li>
                 `;
             }).join('');
+        }
+
+        // 🗑️ 從雲端試算表刪除人員帳號
+        async function deleteStaffFromCloud(id, name) {
+            if (id === currentUserId) {
+                alert('⚠️ 無法刪除目前正在登入使用的管理員帳號！');
+                return;
+            }
+
+            if (!confirm(`⚠️ 確定要移除人員【${name} (${id})】嗎？此動作將同步從雲端 Accounts 試算表中刪除！`)) return;
+
+            try {
+                if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
+                    await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'deleteAccount',
+                            id: id
+                        })
+                    });
+                }
+
+                alert(`🎉 已成功移除人員【${name}】並同步至雲端！`);
+                await fetchAccountsFromCloud();
+            } catch (e) {
+                console.error(e);
+                alert('刪除失敗，請確認網路連線。');
+            }
         }
 
         async function addStaffToCloud() {
