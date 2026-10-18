@@ -3,113 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>內部電腦設備報修與管理系統</title>
+    <title>電腦設備報修系統 1.0v</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 高級企業科技背景紋理 */
+        .bg-tech-pattern {
+            background-color: #e2e8f0;
+            background-image: 
+                radial-gradient(at 15% 15%, rgba(30, 41, 59, 0.12) 0px, transparent 40%),
+                radial-gradient(at 85% 15%, rgba(15, 23, 42, 0.1) 0px, transparent 40%),
+                radial-gradient(at 50% 85%, rgba(30, 58, 138, 0.12) 0px, transparent 50%),
+                radial-gradient(#94a3b8 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 20px 20px;
+        }
+        /* 企業級藍灰金屬質感卡片 */
+        .pro-card {
+            background: linear-gradient(135deg, rgba(248, 250, 252, 0.98) 0%, rgba(241, 245, 249, 0.95) 50%, rgba(239, 246, 255, 0.92) 100%);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+        }
+    </style>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body class="bg-tech-pattern text-slate-800 font-sans min-h-screen">
 
-    <!-- 頂部導覽列 -->
-    <header class="bg-blue-900 text-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold flex items-center gap-2">
-                🖥️ 內部電腦設備報修與管理系統
-            </h1>
-            <!-- 未登入狀態 -->
-            <div id="navAuthArea" class="flex items-center gap-3">
-                <span id="currentRoleBadge" class="text-sm text-blue-200">目前身分：一般使用者</span>
-                <button onclick="openLoginModal()" class="bg-blue-700 hover:bg-blue-600 px-3 py-1.5 rounded text-sm transition">
-                    🔐 系統登入 (工程師/管理員)
-                </button>
+    <!-- 頂部導覽列 (深邃企業藍灰) -->
+    <header class="bg-gradient-to-r from-slate-950 via-slate-900 to-blue-950 text-white shadow-xl relative border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center gap-5">
+            <!-- 標題置中放大 -->
+            <div class="w-full text-center sm:text-left">
+                <h1 class="text-3xl sm:text-4xl font-black tracking-wider flex items-center justify-center sm:justify-start gap-3 drop-shadow-md">
+                    🖥️ 電腦設備報修系統 <span class="text-xs sm:text-sm font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30 px-2.5 py-1 rounded-md tracking-normal">v1.0 Pro</span>
+                </h1>
             </div>
-            <!-- 已登入狀態 -->
-            <div id="navLogoutArea" class="hidden flex items-center gap-3">
-                <span id="loggedInName" class="text-sm text-green-300 font-semibold"></span>
-                <button onclick="openChangePwdModal()" class="bg-blue-700 hover:bg-blue-600 px-3 py-1.5 rounded text-sm transition">
-                    🔑 修改密碼
-                </button>
-                <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded text-sm transition">
-                    登出
-                </button>
+            
+            <!-- 身分與登入狀態 -->
+            <div class="flex items-center gap-4 shrink-0">
+                <!-- 未登入狀態 -->
+                <div id="navAuthArea" class="flex items-center gap-3">
+                    <span id="currentRoleBadge" class="text-sm bg-slate-800/90 px-4 py-1.5 rounded-full text-slate-300 border border-slate-700 font-medium">目前身分：一般使用者</span>
+                    <button onclick="openLoginModal()" class="bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-600 hover:to-indigo-600 text-white font-bold px-5 py-2.5 rounded-xl text-base transition shadow-md hover:shadow-lg hover:scale-105 active:scale-95 border border-blue-500/30">
+                        🔐 系統登入
+                    </button>
+                </div>
+                <!-- 已登入狀態 -->
+                <div id="navLogoutArea" class="hidden flex items-center gap-3">
+                    <span id="loggedInName" class="text-base text-emerald-400 font-bold bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 shadow-inner"></span>
+                    <button onclick="openChangePwdModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2 rounded-xl text-base font-bold transition shadow-sm hover:scale-105">
+                        🔑 修改密碼
+                    </button>
+                    <button onclick="logout()" class="bg-rose-700 hover:bg-rose-800 text-white px-4 py-2 rounded-xl text-base transition font-bold shadow-sm hover:scale-105">
+                        登出
+                    </button>
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-6">
-        <!-- 動態頁籤區域 -->
-        <div class="flex border-b border-gray-200 mb-6 gap-1" id="tabNav">
-            <button onclick="switchTab('submit')" id="tab-submit" class="py-2 px-4 font-semibold text-blue-600 border-b-2 border-blue-600">我要報修</button>
-            <button onclick="switchTab('list')" id="tab-list" class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-600">報修案件清單</button>
-            <span id="dynamicTabs" class="flex gap-1"></span>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <!-- 頁籤選單（藍灰沉穩膠囊按鈕） -->
+        <div class="flex flex-wrap border-b border-slate-300/80 pb-5 mb-8 gap-4" id="tabNav">
+            <button onclick="switchTab('submit')" id="tab-submit" class="px-6 py-3 rounded-2xl font-black text-base transition shadow-md bg-slate-900 text-white border border-slate-800">
+                📝 我要報修
+            </button>
+            <button onclick="switchTab('list')" id="tab-list" class="px-6 py-3 rounded-2xl font-black text-base transition text-slate-800 bg-slate-200/90 hover:bg-slate-300 border border-slate-300/90 shadow-sm">
+                📋 報修案件清單
+            </button>
+            <span id="dynamicTabs" class="flex gap-4"></span>
         </div>
 
-        <!-- 0. 數據儀表板 (工程師與管理員) -->
-        <section id="section-dashboard" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hidden">
-            <h2 class="text-lg font-bold mb-4 text-gray-700 border-b pb-2 flex items-center gap-2">
+        <!-- 0. 數據儀表板 -->
+        <section id="section-dashboard" class="pro-card p-8 sm:p-10 rounded-3xl border border-slate-300/80 hidden mb-8">
+            <h2 class="text-2xl font-black mb-6 text-slate-800 border-b border-slate-300/80 pb-4 flex items-center gap-2">
                 📊 報修案件數據統計與監控 Dashboard
             </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="bg-red-50 border border-red-200 p-4 rounded-xl cursor-pointer hover:shadow-md transition" onclick="filterListByStatus('待處理')">
-                    <div class="text-xs font-semibold text-red-600 uppercase tracking-wider mb-1">未處理案件 (待處理)</div>
-                    <div id="countPending" class="text-3xl font-extrabold text-red-700">0</div>
-                    <div class="text-xs text-red-500 mt-1">點擊查看待處理清單 →</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-rose-100/70 border border-rose-300/80 p-6 rounded-2xl cursor-pointer hover:shadow-xl hover:-translate-y-1 transition duration-200" onclick="filterListByStatus('待處理')">
+                    <div class="text-xs font-black text-rose-800 uppercase tracking-wider mb-2">未處理案件 (待處理)</div>
+                    <div id="countPending" class="text-5xl font-black text-rose-900">0</div>
+                    <div class="text-xs text-rose-700 mt-3 font-bold">點擊查看待處理清單 →</div>
                 </div>
-                <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-xl cursor-pointer hover:shadow-md transition" onclick="filterListByStatus('處理中')">
-                    <div class="text-xs font-semibold text-yellow-600 uppercase tracking-wider mb-1">處理中案件</div>
-                    <div id="countProcessing" class="text-3xl font-extrabold text-yellow-700">0</div>
-                    <div class="text-xs text-yellow-500 mt-1">點擊查看處理中清單 →</div>
+                <div class="bg-amber-100/70 border border-amber-300/80 p-6 rounded-2xl cursor-pointer hover:shadow-xl hover:-translate-y-1 transition duration-200" onclick="filterListByStatus('處理中')">
+                    <div class="text-xs font-black text-amber-800 uppercase tracking-wider mb-2">處理中案件</div>
+                    <div id="countProcessing" class="text-5xl font-black text-amber-900">0</div>
+                    <div class="text-xs text-amber-700 mt-3 font-bold">點擊查看處理中清單 →</div>
                 </div>
-                <div class="bg-green-50 border border-green-200 p-4 rounded-xl cursor-pointer hover:shadow-md transition" onclick="filterListByStatus('已完修')">
-                    <div class="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">已完修案件</div>
-                    <div id="countDone" class="text-3xl font-extrabold text-green-700">0</div>
-                    <div class="text-xs text-green-500 mt-1">點擊查看完修歷史 →</div>
+                <div class="bg-emerald-100/70 border border-emerald-300/80 p-6 rounded-2xl cursor-pointer hover:shadow-xl hover:-translate-y-1 transition duration-200" onclick="filterListByStatus('已完修')">
+                    <div class="text-xs font-black text-emerald-800 uppercase tracking-wider mb-2">已完修案件</div>
+                    <div id="countDone" class="text-5xl font-black text-emerald-900">0</div>
+                    <div class="text-xs text-emerald-700 mt-3 font-bold">點擊查看完修歷史 →</div>
                 </div>
-                <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl cursor-pointer hover:shadow-md transition" onclick="filterListByStatus('全部')">
-                    <div class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">案件總筆數</div>
-                    <div id="countTotal" class="text-3xl font-extrabold text-blue-700">0</div>
-                    <div class="text-xs text-blue-500 mt-1">點擊查看全部案件 →</div>
+                <div class="bg-slate-200/80 border border-slate-300/90 p-6 rounded-2xl cursor-pointer hover:shadow-xl hover:-translate-y-1 transition duration-200" onclick="filterListByStatus('全部')">
+                    <div class="text-xs font-black text-slate-700 uppercase tracking-wider mb-2">案件總筆數</div>
+                    <div id="countTotal" class="text-5xl font-black text-slate-900">0</div>
+                    <div class="text-xs text-slate-700 mt-3 font-bold">點擊查看全部案件 →</div>
                 </div>
             </div>
-            <div class="border rounded-lg p-4 bg-gray-50">
-                <h3 class="font-bold text-gray-700 mb-3 flex justify-between items-center">
+            <div class="border rounded-2xl p-6 bg-slate-200/50 border-slate-300/80">
+                <h3 class="font-black text-slate-800 mb-4 flex justify-between items-center text-lg">
                     <span>🚨 未處理急件快速查看區</span>
                 </h3>
-                <div id="dashboardPendingList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                <div id="dashboardPendingList" class="space-y-3 max-h-64 overflow-y-auto"></div>
             </div>
         </section>
 
         <!-- 1. 我要報修表單 -->
-        <section id="section-submit" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 max-w-2xl mx-auto">
-            <h2 class="text-lg font-bold mb-4 text-gray-700 border-b pb-2">填寫設備報修單</h2>
-            <form id="repairForm" onsubmit="handleRepairSubmit(event)" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <section id="section-submit" class="pro-card p-8 sm:p-12 rounded-3xl border border-slate-300/90 max-w-4xl mx-auto">
+            <div class="border-b border-slate-300/80 pb-5 mb-8">
+                <h2 class="text-3xl font-black text-slate-900 flex items-center gap-3">
+                    📝 填寫設備報修單
+                </h2>
+                <p class="text-base text-slate-600 mt-2 font-medium">請正確填寫設備資訊與狀況，資訊室將派員處理並即時記錄處理進度。</p>
+            </div>
+            <form id="repairForm" onsubmit="handleRepairSubmit(event)" class="space-y-7">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-7">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">報修人姓名 <span class="text-red-500">*</span></label>
-                        <input type="text" id="userName" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="例如：王小明（2~5字中文）">
+                        <label class="block text-base font-bold text-slate-800 mb-2">報修人姓名 <span class="text-rose-600">*</span></label>
+                        <input type="text" id="userName" required class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none transition bg-white/80" placeholder="例如：王小明（2~5字中文）">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">所屬科室</label>
-                        <select id="userDept" class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+                        <label class="block text-base font-bold text-slate-800 mb-2">所屬科室</label>
+                        <select id="userDept" class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none bg-white/80 transition font-medium"></select>
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">電腦編號 / 財產編號</label>
-                    <input type="text" id="assetId" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="例如：PC-108">
+                    <label class="block text-base font-bold text-slate-800 mb-2">電腦編號 / 財產編號 <span class="text-rose-600">*</span></label>
+                    <input type="text" id="assetId" required class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none transition bg-white/80" placeholder="例如：PC-108 或 PRN-002">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">報修內容與故障描述</label>
-                    <textarea id="repairDesc" rows="4" required class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="請詳細描述異常狀況..."></textarea>
+                    <label class="block text-base font-bold text-slate-800 mb-2">報修內容與故障描述 <span class="text-rose-600">*</span></label>
+                    <textarea id="repairDesc" rows="5" required class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none transition bg-white/80" placeholder="請詳細描述異常狀況（例如：無法開機、螢幕藍底白字、印表機卡紙等）..."></textarea>
                 </div>
-                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">送出報修單</button>
+                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 hover:from-blue-800 hover:to-slate-800 text-white font-black py-4 rounded-2xl text-xl shadow-xl hover:shadow-2xl transition transform active:scale-[0.99] border border-blue-700/40">
+                    🚀 送出報修單
+                </button>
             </form>
         </section>
 
         <!-- 2. 報修案件清單 -->
-        <section id="section-list" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hidden">
-            <div class="flex flex-wrap justify-between items-center mb-4 border-b pb-2 gap-2">
-                <h2 class="text-lg font-bold text-gray-700">報修案件總覽</h2>
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-600">依狀態篩選：</span>
-                    <select id="statusFilter" onchange="renderRepairs()" class="border rounded px-2 py-1 text-sm bg-gray-50 focus:outline-none">
+        <section id="section-list" class="pro-card p-8 sm:p-10 rounded-3xl border border-slate-300/90 hidden">
+            <div class="flex flex-wrap justify-between items-center mb-6 border-b border-slate-300/80 pb-4 gap-4">
+                <h2 class="text-2xl font-black text-slate-900">📋 報修案件總覽</h2>
+                <div class="flex items-center gap-3">
+                    <span class="text-base font-bold text-slate-700">依狀態篩選：</span>
+                    <select id="statusFilter" onchange="renderRepairs()" class="border-2 border-slate-300 rounded-xl px-4 py-2 text-base bg-white focus:outline-none font-bold text-slate-800">
                         <option value="全部">全部狀態</option>
                         <option value="待處理">待處理 (未處理)</option>
                         <option value="處理中">處理中</option>
@@ -118,118 +154,120 @@
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
+                <table class="w-full text-left border-collapse text-base">
                     <thead>
-                        <tr class="bg-gray-100 text-gray-700 border-b">
-                            <th class="p-3">單號/日期</th>
-                            <th class="p-3">科室 / 姓名</th>
-                            <th class="p-3">財產編號</th>
-                            <th class="p-3">報修內容</th>
-                            <th class="p-3">狀態</th>
-                            <th class="p-3">維修過程紀錄</th>
-                            <th class="p-3 text-center">操作管理</th>
+                        <tr class="bg-slate-200/80 text-slate-800 border-b-2 border-slate-300/80">
+                            <th class="p-4 sm:p-5 font-black text-lg">單號/日期</th>
+                            <th class="p-4 sm:p-5 font-black text-lg">科室 / 姓名</th>
+                            <th class="p-4 sm:p-5 font-black text-lg">財產編號</th>
+                            <th class="p-4 sm:p-5 font-black text-lg">報修內容</th>
+                            <th class="p-4 sm:p-5 font-black text-lg">狀態</th>
+                            <th class="p-4 sm:p-5 font-black text-lg">維修過程紀錄</th>
+                            <th class="p-4 sm:p-5 font-black text-lg text-center">操作管理</th>
                         </tr>
                     </thead>
-                    <tbody id="repairTableBody"></tbody>
+                    <tbody id="repairTableBody" class="divide-y divide-slate-300/60"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- 3. 系統與人員管理 (僅管理員解鎖) -->
-        <section id="section-admin" class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 hidden">
-            <h2 class="text-lg font-bold mb-4 text-gray-700 border-b pb-2">⚙️ 系統設定與人員清單管理 (同步雲端)</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 3. 系統與人員管理 -->
+        <section id="section-admin" class="pro-card p-8 sm:p-10 rounded-3xl border border-slate-300/90 hidden">
+            <h2 class="text-2xl font-black mb-6 text-slate-900 border-b border-slate-300/80 pb-4">⚙️ 系統設定與人員清單管理 (同步雲端)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <!-- 科室管理 -->
-                <div class="border p-4 rounded-lg bg-gray-50">
-                    <h3 class="font-semibold text-gray-700 mb-3">🏢 管理科室清單</h3>
-                    <div class="flex gap-2 mb-3">
-                        <input type="text" id="newDeptInput" placeholder="輸入新科室名稱" class="flex-1 border rounded px-3 py-1 text-sm">
-                        <button onclick="addDepartment()" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">新增</button>
+                <div class="border border-slate-300/80 p-6 rounded-2xl bg-slate-200/40">
+                    <h3 class="font-black text-slate-800 text-lg mb-4">🏢 管理科室清單</h3>
+                    <div class="flex gap-3 mb-4">
+                        <input type="text" id="newDeptInput" placeholder="輸入新科室名稱" class="flex-1 border-2 rounded-xl px-4 py-2.5 text-base focus:outline-none border-slate-300 bg-white">
+                        <button onclick="addDepartment()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-5 py-2.5 rounded-xl text-base transition shadow-sm">新增</button>
                     </div>
-                    <ul id="deptList" class="space-y-2 max-h-48 overflow-y-auto"></ul>
+                    <ul id="deptList" class="space-y-2 max-h-56 overflow-y-auto"></ul>
                 </div>
 
-                <!-- 系統人員與角色管理 (同步至 Google 試算表) -->
-                <div class="border p-4 rounded-lg bg-gray-50">
-                    <h3 class="font-semibold text-gray-700 mb-3">👥 新增/管理人員角色至雲端</h3>
+                <!-- 系統人員與角色管理 -->
+                <div class="border border-slate-300/80 p-6 rounded-2xl bg-slate-200/40">
+                    <h3 class="font-black text-slate-800 text-lg mb-4">👥 新增/管理人員角色至雲端</h3>
                     <div class="flex gap-2 mb-3">
-                        <input type="text" id="newStaffName" placeholder="姓名 / 稱謂" class="w-1/3 border rounded px-3 py-1 text-sm">
-                        <input type="text" id="newStaffId" placeholder="登入編號" class="w-1/3 border rounded px-3 py-1 text-sm font-mono">
-                        <select id="newStaffRole" class="w-1/3 border rounded px-3 py-1 text-sm">
+                        <input type="text" id="newStaffName" placeholder="姓名 / 稱謂" class="w-1/3 border-2 rounded-xl px-3 py-2 text-base border-slate-300 bg-white">
+                        <input type="text" id="newStaffId" placeholder="登入編號" class="w-1/3 border-2 rounded-xl px-3 py-2 text-base font-mono border-slate-300 bg-white">
+                        <select id="newStaffRole" class="w-1/3 border-2 rounded-xl px-3 py-2 text-base border-slate-300 bg-white font-bold">
                             <option value="user">一般使用者</option>
                             <option value="engineer">工程師</option>
                             <option value="admin">管理員</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <input type="text" id="newStaffPwd" placeholder="設定登入密碼" class="w-full border rounded px-3 py-1 text-sm">
+                    <div class="mb-4">
+                        <input type="text" id="newStaffPwd" placeholder="設定登入密碼" class="w-full border-2 rounded-xl px-4 py-2 text-base border-slate-300 bg-white">
                     </div>
-                    <button onclick="addStaffToCloud()" id="addStaffBtn" class="w-full bg-green-600 text-white py-1.5 rounded text-sm hover:bg-green-700 mb-3">同步儲存人員至雲端試算表</button>
-                    <ul id="staffList" class="space-y-2 max-h-48 overflow-y-auto"></ul>
+                    <button onclick="addStaffToCloud()" id="addStaffBtn" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-black py-3 rounded-xl text-base transition mb-4 shadow-md">
+                        同步儲存人員至雲端試算表
+                    </button>
+                    <ul id="staffList" class="space-y-2 max-h-56 overflow-y-auto"></ul>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- 登入視窗 -->
-    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white p-6 rounded-xl w-full max-w-sm shadow-lg">
-            <h3 class="text-lg font-bold mb-3 text-gray-700">🔐 系統登入驗證</h3>
-            <div class="mb-3">
-                <label class="block text-sm text-gray-600 mb-1">登入編號</label>
-                <input type="text" id="loginIdInput" class="w-full border rounded px-3 py-2 text-sm font-mono" placeholder="請輸入編號 (如: eng01)">
-            </div>
+    <div id="loginModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center hidden z-50">
+        <div class="pro-card p-8 sm:p-10 rounded-3xl w-full max-w-md shadow-2xl border border-slate-300">
+            <h3 class="text-2xl font-black mb-5 text-slate-900 border-b border-slate-300/80 pb-3">🔐 系統登入驗證</h3>
             <div class="mb-4">
-                <label class="block text-sm text-gray-600 mb-1">登入密碼</label>
-                <input type="password" id="loginPassword" class="w-full border rounded px-3 py-2 text-sm" placeholder="請輸入密碼">
+                <label class="block text-base font-bold text-slate-800 mb-1">登入編號</label>
+                <input type="text" id="loginIdInput" class="w-full border-2 rounded-xl px-4 py-3 text-base font-mono border-slate-300 focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none" placeholder="請輸入編號 (如: eng01)">
             </div>
-            <div class="flex justify-end gap-2">
-                <button onclick="closeLoginModal()" class="bg-gray-300 px-4 py-2 rounded text-sm text-gray-700">取消</button>
-                <button onclick="verifyLogin()" id="loginBtn" class="bg-blue-600 px-4 py-2 rounded text-sm text-white">確認登入</button>
+            <div class="mb-6">
+                <label class="block text-base font-bold text-slate-800 mb-1">登入密碼</label>
+                <input type="password" id="loginPassword" class="w-full border-2 rounded-xl px-4 py-3 text-base border-slate-300 focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none" placeholder="請輸入密碼">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeLoginModal()" class="bg-slate-300 hover:bg-slate-400 px-5 py-2.5 rounded-xl text-base text-slate-800 font-bold transition">取消</button>
+                <button onclick="verifyLogin()" id="loginBtn" class="bg-slate-900 hover:bg-slate-800 px-6 py-2.5 rounded-xl text-base text-white font-black transition shadow-md">確認登入</button>
             </div>
         </div>
     </div>
 
     <!-- 修改密碼視窗 -->
-    <div id="changePwdModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white p-6 rounded-xl w-full max-w-sm shadow-lg">
-            <h3 class="text-lg font-bold mb-3 text-gray-700">修改目前帳號密碼</h3>
-            <div class="mb-3">
-                <label class="block text-sm text-gray-600 mb-1">原本密碼</label>
-                <input type="password" id="oldPassword" class="w-full border rounded px-3 py-2 text-sm">
-            </div>
+    <div id="changePwdModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center hidden z-50">
+        <div class="pro-card p-8 sm:p-10 rounded-3xl w-full max-w-md shadow-2xl border border-slate-300">
+            <h3 class="text-2xl font-black mb-5 text-slate-900 border-b border-slate-300/80 pb-3">🔑 修改目前帳號密碼</h3>
             <div class="mb-4">
-                <label class="block text-sm text-gray-600 mb-1">新密碼</label>
-                <input type="password" id="newPassword" class="w-full border rounded px-3 py-2 text-sm" placeholder="請輸入新密碼">
+                <label class="block text-base font-bold text-slate-800 mb-1">原本密碼</label>
+                <input type="password" id="oldPassword" class="w-full border-2 rounded-xl px-4 py-3 text-base border-slate-300">
             </div>
-            <div class="flex justify-end gap-2">
-                <button onclick="closeChangePwdModal()" class="bg-gray-300 px-4 py-2 rounded text-sm text-gray-700">取消</button>
-                <button onclick="saveNewPasswordCloud()" id="changePwdBtn" class="bg-blue-600 px-4 py-2 rounded text-sm text-white">儲存新密碼至雲端</button>
+            <div class="mb-6">
+                <label class="block text-base font-bold text-slate-800 mb-1">新密碼</label>
+                <input type="password" id="newPassword" class="w-full border-2 rounded-xl px-4 py-3 text-base border-slate-300" placeholder="請輸入新密碼">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeChangePwdModal()" class="bg-slate-300 hover:bg-slate-400 px-5 py-2.5 rounded-xl text-base text-slate-800 font-bold transition">取消</button>
+                <button onclick="saveNewPasswordCloud()" id="changePwdBtn" class="bg-slate-900 hover:bg-slate-800 px-6 py-2.5 rounded-xl text-base text-white font-black transition shadow-md">儲存新密碼至雲端</button>
             </div>
         </div>
     </div>
 
     <!-- 維修過程填寫視窗 -->
-    <div id="processModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
-        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg">
-            <h3 class="text-lg font-bold mb-3 text-gray-700">更新維修進度</h3>
+    <div id="processModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center hidden z-50">
+        <div class="pro-card p-8 sm:p-10 rounded-3xl w-full max-w-lg shadow-2xl border border-slate-300">
+            <h3 class="text-2xl font-black mb-5 text-slate-900 border-b border-slate-300/80 pb-3">🛠️ 更新維修進度</h3>
             <input type="hidden" id="modalRepairId">
-            <div class="mb-3">
-                <label class="block text-sm text-gray-600 mb-1">狀態設定</label>
-                <select id="modalStatus" class="w-full border rounded px-3 py-2 text-sm">
+            <div class="mb-4">
+                <label class="block text-base font-bold text-slate-800 mb-1">狀態設定</label>
+                <select id="modalStatus" class="w-full border-2 rounded-xl px-4 py-3 text-base border-slate-300 bg-white font-bold text-slate-800">
                     <option value="待處理">🔴 待處理 (未處理)</option>
                     <option value="處理中">🟡 處理中</option>
                     <option value="已完修">🟢 已完修 (完成)</option>
                     <option value="無法修復/送修">⚪ 無法修復/送修外商</option>
                 </select>
             </div>
-            <div class="mb-4">
-                <label class="block text-sm text-gray-600 mb-1">維修過程紀錄</label>
-                <textarea id="modalProcessLog" rows="4" class="w-full border rounded px-3 py-2 text-sm" placeholder="請填寫檢修過程..."></textarea>
+            <div class="mb-6">
+                <label class="block text-base font-bold text-slate-800 mb-1">維修過程紀錄</label>
+                <textarea id="modalProcessLog" rows="4" class="w-full border-2 rounded-xl px-4 py-3 text-base border-slate-300 focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none" placeholder="請填寫檢修過程..."></textarea>
             </div>
-            <div class="flex justify-end gap-2">
-                <button onclick="closeProcessModal()" class="bg-gray-300 px-4 py-2 rounded text-sm text-gray-700">取消</button>
-                <button onclick="saveRepairProcess()" class="bg-blue-600 px-4 py-2 rounded text-sm text-white">儲存更新</button>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeProcessModal()" class="bg-slate-300 hover:bg-slate-400 px-5 py-2.5 rounded-xl text-base text-slate-800 font-bold transition">取消</button>
+                <button onclick="saveRepairProcess()" class="bg-slate-900 hover:bg-slate-800 px-6 py-2.5 rounded-xl text-base text-white font-black transition shadow-md">儲存更新</button>
             </div>
         </div>
     </div>
@@ -241,21 +279,45 @@
         let currentRole = localStorage.getItem('currentRole') || 'user';
         let currentUserId = localStorage.getItem('currentUserId') || '';
 
-        // 雲端帳號清單與報修紀錄
         let staffList = [];
         let departments = JSON.parse(localStorage.getItem('departments')) || ['資訊室', '總務科', '政風室', '會計室', '業務一科'];
         let repairs = JSON.parse(localStorage.getItem('repairs')) || [];
 
+        // 🛡️ 安全機制：閒置超時自動登出設定 (預設 5 分鐘)
+        const INACTIVITY_TIMEOUT = 5 * 60 * 1000;
+        let inactivityTimer;
+
+        // 🛡️ 安全機制：登入失敗記錄與 IP 防護
+        let loginFailedAttempts = 0;
+        let isLoginLocked = false;
+
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            if (currentRole !== 'user') {
+                inactivityTimer = setTimeout(autoLogoutDueToInactivity, INACTIVITY_TIMEOUT);
+            }
+        }
+
+        function autoLogoutDueToInactivity() {
+            if (currentRole !== 'user') {
+                logout(true);
+            }
+        }
+
+        ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'].forEach(eventName => {
+            document.addEventListener(eventName, resetInactivityTimer, true);
+        });
+
         window.onload = async function() {
-            await fetchAccountsFromCloud(); // 抓取雲端帳號
-            await fetchRepairsFromCloud();  // 🌟 抓取試算表舊報修資料
+            await fetchAccountsFromCloud(); 
+            await fetchRepairsFromCloud();  
             updateUI();
             renderDepts();
             renderRepairs();
             updateDashboard();
+            resetInactivityTimer();
         };
 
-        // 🌟 1. 從 Google 試算表（Accounts 分頁）獲取帳號清單
         async function fetchAccountsFromCloud() {
             try {
                 if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
@@ -269,7 +331,6 @@
                 console.error("無法連線至雲端帳號資料，使用備份帳號：", e);
             }
 
-            // 備份預設帳號（若雲端連線失敗時防呆）
             if (staffList.length === 0) {
                 staffList = [
                     { name: '王小明', id: 'user01', pwd: 'user123', role: 'user' },
@@ -280,7 +341,6 @@
             renderStaff();
         }
 
-        // 🌟 2. 從 Google 試算表載入所有歷史報修資料
         async function fetchRepairsFromCloud() {
             try {
                 if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
@@ -293,6 +353,38 @@
                 }
             } catch (e) {
                 console.error("無法載入雲端報修資料：", e);
+            }
+        }
+
+        // 🛡️ 獲取訪問者 IP 地址
+        async function getClientIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                return data.ip || 'UNKNOWN_IP';
+            } catch (e) {
+                return 'IP_FETCH_FAILED';
+            }
+        }
+
+        // 🛡️ 上傳異常登入安全日誌至 Google 試算表
+        async function logSecurityAlert(attemptedId, userIp) {
+            if (!WEB_APP_URL || WEB_APP_URL.includes('你的部署ID')) return;
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'logSecurityAlert',
+                        attemptedId: attemptedId,
+                        ip: userIp,
+                        timestamp: new Date().toLocaleString(),
+                        userAgent: navigator.userAgent
+                    })
+                });
+            } catch (e) {
+                console.error("無法傳送安全日誌：", e);
             }
         }
 
@@ -314,15 +406,15 @@
                 navLogout.classList.remove('hidden');
                 loggedName.innerText = `身分：工程師 (${currentUserId || 'eng01'})`;
                 dynamicTabs.innerHTML = `
-                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-600">📊 數據儀表板</button>
+                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-6 py-3 rounded-2xl font-black text-base transition text-slate-800 bg-slate-200/90 hover:bg-slate-300 border border-slate-300/90 shadow-sm">📊 數據儀表板</button>
                 `;
             } else if (currentRole === 'admin') {
                 navAuth.classList.add('hidden');
                 navLogout.classList.remove('hidden');
                 loggedName.innerText = `身分：管理員 (${currentUserId || 'admin01'})`;
                 dynamicTabs.innerHTML = `
-                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-600">📊 數據儀表板</button>
-                    <button onclick="switchTab('admin')" id="tab-admin" class="py-2 px-4 font-semibold text-gray-500 hover:text-blue-600">系統與人員管理</button>
+                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-6 py-3 rounded-2xl font-black text-base transition text-slate-800 bg-slate-200/90 hover:bg-slate-300 border border-slate-300/90 shadow-sm">📊 數據儀表板</button>
+                    <button onclick="switchTab('admin')" id="tab-admin" class="px-6 py-3 rounded-2xl font-black text-base transition text-slate-800 bg-slate-200/90 hover:bg-slate-300 border border-slate-300/90 shadow-sm">⚙️ 系統與人員管理</button>
                 `;
             }
             renderRepairs();
@@ -330,6 +422,10 @@
         }
 
         function openLoginModal() { 
+            if (isLoginLocked) {
+                alert('⚠️ 登入功能因多次嘗試失敗已被暫時鎖定，請稍後再試！');
+                return;
+            }
             document.getElementById('loginIdInput').value = '';
             document.getElementById('loginPassword').value = '';
             document.getElementById('loginModal').classList.remove('hidden'); 
@@ -337,6 +433,11 @@
         function closeLoginModal() { document.getElementById('loginModal').classList.add('hidden'); }
 
         async function verifyLogin() {
+            if (isLoginLocked) {
+                alert('⚠️ 登入功能暫時鎖定中，請稍後再試！');
+                return;
+            }
+
             const inputId = document.getElementById('loginIdInput').value.trim();
             const inputPwd = document.getElementById('loginPassword').value.trim();
             const loginBtn = document.getElementById('loginBtn');
@@ -344,11 +445,12 @@
             loginBtn.innerText = "驗證中...";
             loginBtn.disabled = true;
 
-            await fetchAccountsFromCloud(); // 比對前重新抓一次試算表最新帳號
+            await fetchAccountsFromCloud(); 
 
             const matchedStaff = staffList.find(s => s.id === inputId && String(s.pwd) === inputPwd);
 
             if (matchedStaff) {
+                loginFailedAttempts = 0; // 重置失敗計數
                 currentRole = matchedStaff.role;
                 currentUserId = matchedStaff.id;
                 localStorage.setItem('currentRole', currentRole);
@@ -356,22 +458,53 @@
                 closeLoginModal();
                 updateUI();
                 switchTab('dashboard'); 
+                resetInactivityTimer();
                 alert(`登入成功！歡迎 ${matchedStaff.name}。`);
             } else {
-                alert('登入編號或密碼錯誤！');
+                loginFailedAttempts++;
+                
+                if (loginFailedAttempts >= 3) {
+                    isLoginLocked = true;
+                    loginBtn.innerText = "已被鎖定";
+                    
+                    // 抓取 IP 並回報至 Google 試算表
+                    const userIp = await getClientIP();
+                    await logSecurityAlert(inputId || '未知帳號', userIp);
+
+                    alert(`🚨 安全警報：連續登入失敗 3 次！\n系統已記錄您的 IP 地址 [${userIp}] 並回報至管理員。\n登入功能已暫時鎖定 3 分鐘。`);
+                    
+                    closeLoginModal();
+                    
+                    // 3 分鐘後自動解鎖
+                    setTimeout(() => {
+                        isLoginLocked = false;
+                        loginFailedAttempts = 0;
+                        loginBtn.innerText = "確認登入";
+                    }, 3 * 60 * 1000);
+                } else {
+                    alert(`登入失敗！編號或密碼錯誤（剩餘 ${3 - loginFailedAttempts} 次嘗試機會）。`);
+                }
             }
 
-            loginBtn.innerText = "確認登入";
-            loginBtn.disabled = false;
+            if (!isLoginLocked) {
+                loginBtn.innerText = "確認登入";
+                loginBtn.disabled = false;
+            }
         }
 
-        function logout() {
+        function logout(isAuto = false) {
+            clearTimeout(inactivityTimer);
             currentRole = 'user';
             currentUserId = '';
             localStorage.setItem('currentRole', 'user');
             localStorage.removeItem('currentUserId');
             updateUI();
-            alert('已登出');
+            
+            if (isAuto) {
+                alert('⚠️ 由於您已閒置超過 5 分鐘，系統已自動將您登出以維護資訊安全！');
+            } else {
+                alert('已安全登出系統。');
+            }
         }
 
         function openChangePwdModal() { document.getElementById('changePwdModal').classList.remove('hidden'); }
@@ -430,14 +563,18 @@
                 if (sec) sec.classList.add('hidden');
 
                 const btn = document.getElementById(`tab-${t}`);
-                if (btn) btn.className = "py-2 px-4 font-semibold text-gray-500 hover:text-blue-600 border-b-2 border-transparent";
+                if (btn) {
+                    btn.className = "px-6 py-3 rounded-2xl font-black text-base transition text-slate-800 bg-slate-200/90 hover:bg-slate-300 border border-slate-300/90 shadow-sm";
+                }
             });
 
             const activeSec = document.getElementById(`section-${tabName}`);
             if (activeSec) activeSec.classList.remove('hidden');
 
             const activeBtn = document.getElementById(`tab-${tabName}`);
-            if (activeBtn) activeBtn.className = "py-2 px-4 font-semibold text-blue-600 border-b-2 border-blue-600";
+            if (activeBtn) {
+                activeBtn.className = "px-6 py-3 rounded-2xl font-black text-base transition shadow-md bg-slate-900 text-white border border-slate-800";
+            }
         }
 
         function updateDashboard() {
@@ -452,16 +589,16 @@
 
             const pendingListEl = document.getElementById('dashboardPendingList');
             if (pending.length === 0) {
-                pendingListEl.innerHTML = `<div class="text-sm text-gray-500 py-2">🎉 目前沒有任何待處理案件。</div>`;
+                pendingListEl.innerHTML = `<div class="text-base text-slate-500 py-2 font-medium">🎉 目前沒有任何待處理案件。</div>`;
             } else {
                 pendingListEl.innerHTML = pending.map(r => `
-                    <div class="flex justify-between items-center bg-white p-3 rounded border border-red-100 shadow-sm">
-                        <div class="text-sm">
-                            <span class="font-bold text-red-600 mr-2">[${r.id}]</span>
-                            <span class="font-semibold text-gray-800">${r.dept} - ${r.name}</span>
-                            <span class="text-xs text-gray-500 block">${r.asset}：${r.desc}</span>
+                    <div class="flex justify-between items-center bg-white/90 p-4 rounded-xl border border-rose-200 shadow-sm">
+                        <div class="text-base">
+                            <span class="font-black text-rose-700 mr-2">[${r.id}]</span>
+                            <span class="font-bold text-slate-800">${r.dept} - ${r.name}</span>
+                            <span class="text-sm text-slate-600 block mt-1">${r.asset}：${r.desc}</span>
                         </div>
-                        <button onclick="openProcessModal('${r.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">立即處理</button>
+                        <button onclick="openProcessModal('${r.id}')" class="bg-rose-700 hover:bg-rose-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-sm">立即處理</button>
                     </div>
                 `).join('');
             }
@@ -476,9 +613,9 @@
         function renderDepts() {
             document.getElementById('userDept').innerHTML = departments.map(d => `<option value="${d}">${d}</option>`).join('');
             document.getElementById('deptList').innerHTML = departments.map((d, index) => `
-                <li class="flex justify-between items-center bg-white p-2 rounded border text-sm">
-                    <span>${d}</span>
-                    <button onclick="deleteDept(${index})" class="text-red-500 text-xs hover:underline">刪除</button>
+                <li class="flex justify-between items-center bg-white/80 p-3 rounded-xl border border-slate-300 text-base">
+                    <span class="font-bold text-slate-800">${d}</span>
+                    <button onclick="deleteDept(${index})" class="text-rose-600 text-sm font-bold hover:underline">刪除</button>
                 </li>
             `).join('');
         }
@@ -488,13 +625,13 @@
             if (!staffListEl) return;
             staffListEl.innerHTML = staffList.map((s) => {
                 let roleName = s.role === 'admin' ? '管理員' : s.role === 'engineer' ? '工程師' : '一般使用者';
-                let roleColor = s.role === 'admin' ? 'text-rose-600' : s.role === 'engineer' ? 'text-amber-600' : 'text-blue-600';
+                let roleColor = s.role === 'admin' ? 'text-rose-700' : s.role === 'engineer' ? 'text-amber-700' : 'text-blue-700';
                 return `
-                    <li class="flex justify-between items-center bg-white p-2 rounded border text-sm">
+                    <li class="flex justify-between items-center bg-white/80 p-3 rounded-xl border border-slate-300 text-base">
                         <div>
-                            <span class="font-bold">${s.name}</span> 
-                            <span class="font-mono text-xs text-gray-500">(${s.id})</span>
-                            <span class="text-xs font-semibold ${roleColor} ml-1">[${roleName}]</span>
+                            <span class="font-bold text-slate-800">${s.name}</span> 
+                            <span class="font-mono text-sm text-slate-500">(${s.id})</span>
+                            <span class="text-sm font-black ${roleColor} ml-1">[${roleName}]</span>
                         </div>
                     </li>
                 `;
@@ -557,7 +694,7 @@
             }
 
             const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = "正在傳送至 Google 試算表...";
+            submitBtn.innerText = "⏳ 正在傳送至 Google 試算表...";
             submitBtn.disabled = true;
 
             const newRepair = {
@@ -577,14 +714,17 @@
                         method: 'POST',
                         mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newRepair)
+                        body: JSON.stringify({
+                            action: 'saveRepair',
+                            data: newRepair
+                        })
                     });
                 }
 
                 repairs.unshift(newRepair);
                 localStorage.setItem('repairs', JSON.stringify(repairs));
 
-                alert('報修單已成功送出！');
+                alert('🎉 報修單已成功送出！');
                 document.getElementById('repairForm').reset();
                 updateDashboard();
                 switchTab('list');
@@ -593,7 +733,7 @@
                 console.error(error);
                 alert('傳送失敗，請確認網路連線。');
             } finally {
-                submitBtn.innerText = "送出報修單";
+                submitBtn.innerText = "🚀 送出報修單";
                 submitBtn.disabled = false;
             }
         }
@@ -608,80 +748,74 @@
             }
 
             if (filteredRepairs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-400">目前無符合條件的報修紀錄</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500 font-bold text-lg">目前無符合條件的報修紀錄</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = filteredRepairs.map(r => {
                 let statusBadge = '';
                 if (r.status === '待處理') {
-                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-300">🔴 待處理</span>`;
+                    statusBadge = `<span class="px-4 py-1.5 rounded-full text-sm font-black bg-rose-100 text-rose-800 border border-rose-300">🔴 待處理</span>`;
                 } else if (r.status === '處理中') {
-                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-300">🟡 處理中</span>`;
+                    statusBadge = `<span class="px-4 py-1.5 rounded-full text-sm font-black bg-amber-100 text-amber-800 border border-amber-300">🟡 處理中</span>`;
                 } else if (r.status === '已完修') {
-                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-300">🟢 已完修</span>`;
+                    statusBadge = `<span class="px-4 py-1.5 rounded-full text-sm font-black bg-emerald-100 text-emerald-800 border border-emerald-300">🟢 已完修</span>`;
                 } else {
-                    statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700 border border-gray-300">${r.status}</span>`;
+                    statusBadge = `<span class="px-4 py-1.5 rounded-full text-sm font-black bg-slate-200 text-slate-700 border border-slate-300">${r.status}</span>`;
                 }
 
                 let actionButtons = '';
                 if (currentRole === 'engineer') {
-                    actionButtons = `<button onclick="openProcessModal('${r.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs transition">處理/更新</button>`;
+                    actionButtons = `<button onclick="openProcessModal('${r.id}')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-md transition">處理/更新</button>`;
                 } else if (currentRole === 'admin') {
                     actionButtons = `
-                        <div class="flex justify-center gap-1.5">
-                            <button onclick="openProcessModal('${r.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded text-xs transition">處理</button>
-                            <button onclick="deleteRepair('${r.id}')" class="bg-red-600 hover:bg-red-700 text-white px-2.5 py-1 rounded text-xs transition">刪除</button>
+                        <div class="flex justify-center gap-2">
+                            <button onclick="openProcessModal('${r.id}')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-md transition">處理</button>
+                            <button onclick="deleteRepair('${r.id}')" class="bg-rose-700 hover:bg-rose-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-md transition">刪除</button>
                         </div>
                     `;
                 } else {
-                    actionButtons = `<span class="text-gray-400 text-xs">僅供檢視</span>`;
+                    actionButtons = `<span class="text-slate-500 text-sm font-bold">僅供檢視</span>`;
                 }
 
                 return `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="p-3 text-xs text-gray-500"><span class="font-mono text-gray-700 font-bold block">${r.id}</span>${r.date}</td>
-                        <td class="p-3 font-medium">${r.dept}<br><span class="text-xs text-gray-500">${r.name}</span></td>
-                        <td class="p-3 font-mono text-xs">${r.asset}</td>
-                        <td class="p-3">${r.desc}</td>
-                        <td class="p-3">${statusBadge}</td>
-                        <td class="p-3 text-xs text-gray-600">${r.processLog}</td>
-                        <td class="p-3 text-center">${actionButtons}</td>
+                    <tr class="hover:bg-slate-200/50 transition">
+                        <td class="p-4 sm:p-5 text-sm text-slate-500"><span class="font-mono text-slate-900 font-bold block text-base">${r.id}</span>${r.date}</td>
+                        <td class="p-4 sm:p-5 font-bold text-slate-900 text-base">${r.dept}<br><span class="text-sm font-normal text-slate-600">${r.name}</span></td>
+                        <td class="p-4 sm:p-5 font-mono text-base font-bold text-slate-800">${r.asset}</td>
+                        <td class="p-4 sm:p-5 text-slate-900 font-medium">${r.desc}</td>
+                        <td class="p-4 sm:p-5">${statusBadge}</td>
+                        <td class="p-4 sm:p-5 text-sm text-slate-700 font-medium">${r.processLog}</td>
+                        <td class="p-4 sm:p-5 text-center">${actionButtons}</td>
                     </tr>
                 `;
             }).join('');
         }
 
-        
-            async function deleteRepair(id) {
-    if (!confirm(`⚠️ 確定要永久刪除報修單 [${id}] 嗎？此動作將同步從 Google 試算表中刪除且無法復原！`)) return;
+        async function deleteRepair(id) {
+            if (!confirm(`⚠️ 確定要永久刪除報修單 [${id}] 嗎？此動作將同步從 Google 試算表中刪除且無法復原！`)) return;
 
-    try {
-        if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
-            await fetch(WEB_APP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'delete',
-                    id: id
-                })
-            });
+            try {
+                if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
+                    await fetch(WEB_APP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'delete', id: id })
+                    });
+                }
+
+                repairs = repairs.filter(r => r.id !== id);
+                localStorage.setItem('repairs', JSON.stringify(repairs));
+                
+                alert(`🎉 已成功刪除案件 [${id}] 並同步至雲端！`);
+                renderRepairs();
+                updateDashboard();
+            } catch (error) {
+                console.error(error);
+                alert('刪除失敗，請檢查網路連線。');
+            }
         }
-
-        // 從本地資料刪除並更新 UI
-        repairs = repairs.filter(r => r.id !== id);
-        localStorage.setItem('repairs', JSON.stringify(repairs));
-        
-        alert(`已成功刪除案件 [${id}] 並同步至雲端！`);
-        renderRepairs();
-        updateDashboard();
-    } catch (error) {
-        console.error(error);
-        alert('刪除失敗，請檢查網路連線。');
-    }
-}
-        
 
         function openProcessModal(id) {
             const repair = repairs.find(r => r.id === id);
@@ -706,7 +840,7 @@
 
                 const saveBtn = event.target;
                 const originalText = saveBtn.innerText;
-                saveBtn.innerText = "同步更新至試算表中...";
+                saveBtn.innerText = "寫入雲端中...";
                 saveBtn.disabled = true;
 
                 try {
@@ -724,7 +858,7 @@
                         });
                     }
 
-                    alert('維修進度與狀態已成功更新！');
+                    alert('🎉 維修進度與狀態已成功更新！');
                     closeProcessModal();
                     renderRepairs();
                     updateDashboard();
