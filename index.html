@@ -29,7 +29,6 @@
     <!-- 頂部導覽列 (深邃企業藍灰) -->
     <header class="bg-gradient-to-r from-slate-950 via-slate-900 to-blue-950 text-white shadow-xl relative border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center gap-5">
-            <!-- 標題置中放大 -->
             <div class="w-full text-center sm:text-left">
                 <h1 class="text-3xl sm:text-4xl font-black tracking-wider flex items-center justify-center sm:justify-start gap-3 drop-shadow-md">
                     🖥️ 電腦設備報修系統 <span class="text-xs sm:text-sm font-semibold bg-blue-500/20 text-blue-300 border border-blue-400/30 px-2.5 py-1 rounded-md tracking-normal">v1.0 Pro</span>
@@ -60,7 +59,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <!-- 頁籤選單（藍灰沉穩膠囊按鈕） -->
+        <!-- 頁籤選單 -->
         <div class="flex flex-wrap border-b border-slate-300/80 pb-5 mb-8 gap-4" id="tabNav">
             <button onclick="switchTab('submit')" id="tab-submit" class="px-6 py-3 rounded-2xl font-black text-base transition shadow-md bg-slate-900 text-white border border-slate-800">
                 📝 我要報修
@@ -115,24 +114,41 @@
                 <p class="text-base text-slate-600 mt-2 font-medium">請正確填寫設備資訊與狀況，資訊室將派員處理並即時記錄處理進度。</p>
             </div>
             <form id="repairForm" onsubmit="handleRepairSubmit(event)" class="space-y-7">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-7">
-                    <div>
+                
+                <!-- 姓名、分機、科室：三欄水平齊平排版 (比例 5 : 3 : 4) -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+                    <!-- 1. 報修人姓名 -->
+                    <div class="md:col-span-5">
                         <label class="block text-base font-bold text-slate-800 mb-2">報修人姓名 <span class="text-rose-600">*</span></label>
-                        <input type="text" id="userName" required class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none transition bg-white/80" placeholder="例如：王小明（2~5字中文）">
+                        <input type="text" id="userName" required class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none transition bg-white/80" placeholder="例如：王小明">
                     </div>
-                    <div>
-                        <label class="block text-base font-bold text-slate-800 mb-2">所屬科室</label>
-                        <select id="userDept" class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none bg-white/80 transition font-medium"></select>
+
+                    <!-- 2. 分機號碼 -->
+                    <div class="md:col-span-3">
+                        <label class="block text-base font-bold text-slate-800 mb-2">分機號碼 <span class="text-rose-600">*</span></label>
+                        <input type="text" id="userExt" required class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none transition bg-white/80" placeholder="例如：1234">
+                    </div>
+
+                    <!-- 3. 所屬科室 -->
+                    <div class="md:col-span-4">
+                        <label class="block text-base font-bold text-slate-800 mb-2">所屬科室 <span class="text-rose-600">*</span></label>
+                        <select id="userDept" required class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none bg-white/80 transition font-medium"></select>
                     </div>
                 </div>
+
+                <!-- 電腦編號 / 財產編號 -->
                 <div>
                     <label class="block text-base font-bold text-slate-800 mb-2">電腦編號 / 財產編號 <span class="text-rose-600">*</span></label>
                     <input type="text" id="assetId" required class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none transition bg-white/80" placeholder="例如：PC-108 或 PRN-002">
                 </div>
+
+                <!-- 報修內容與故障描述 -->
                 <div>
                     <label class="block text-base font-bold text-slate-800 mb-2">報修內容與故障描述 <span class="text-rose-600">*</span></label>
                     <textarea id="repairDesc" rows="5" required class="w-full border-2 border-slate-300 rounded-2xl px-5 py-3.5 text-lg focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none transition bg-white/80" placeholder="請詳細描述異常狀況（例如：無法開機、螢幕藍底白字、印表機卡紙等）..."></textarea>
                 </div>
+
+                <!-- 送出按鈕 -->
                 <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 hover:from-blue-800 hover:to-slate-800 text-white font-black py-4 rounded-2xl text-xl shadow-xl hover:shadow-2xl transition transform active:scale-[0.99] border border-blue-700/40">
                     🚀 送出報修單
                 </button>
@@ -155,23 +171,24 @@
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-base">
-                    <thead>
-                        <tr class="bg-slate-200/80 text-slate-800 border-b-2 border-slate-300/80">
-                            <th class="p-4 sm:p-5 font-black text-lg">單號/日期</th>
-                            <th class="p-4 sm:p-5 font-black text-lg">科室 / 姓名</th>
-                            <th class="p-4 sm:p-5 font-black text-lg">財產編號</th>
-                            <th class="p-4 sm:p-5 font-black text-lg">報修內容</th>
-                            <th class="p-4 sm:p-5 font-black text-lg">狀態</th>
-                            <th class="p-4 sm:p-5 font-black text-lg">維修過程紀錄</th>
-                            <th class="p-4 sm:p-5 font-black text-lg text-center">操作管理</th>
-                        </tr>
-                    </thead>
+                   <thead>
+    <tr class="bg-slate-200/80 text-slate-800 border-b-2 border-slate-300/80 whitespace-nowrap">
+        <th class="p-3.5 font-black text-base">單號/日期</th>
+        <th class="p-3.5 font-black text-base">科室 / 姓名</th>
+        <th class="p-3.5 font-black text-base">分機</th>
+        <th class="p-3.5 font-black text-base">財產編號</th>
+        <th class="p-3.5 font-black text-base">報修內容</th>
+        <th class="p-3.5 font-black text-base">狀態</th>
+        <th class="p-3.5 font-black text-base">維修過程紀錄</th>
+        <th class="p-3.5 font-black text-base text-center">操作管理</th>
+    </tr>
+</thead>
                     <tbody id="repairTableBody" class="divide-y divide-slate-300/60"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- 3. 系統與人員管理 (支援刪除人員) -->
+        <!-- 3. 系統與人員管理 -->
         <section id="section-admin" class="pro-card p-8 sm:p-10 rounded-3xl border border-slate-300/90 hidden">
             <h2 class="text-2xl font-black mb-6 text-slate-900 border-b border-slate-300/80 pb-4">⚙️ 系統設定與人員清單管理 (同步雲端)</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -215,7 +232,7 @@
             <h3 class="text-2xl font-black mb-5 text-slate-900 border-b border-slate-300/80 pb-3">🔐 系統登入驗證</h3>
             <div class="mb-4">
                 <label class="block text-base font-bold text-slate-800 mb-1">登入編號</label>
-                <input type="text" id="loginIdInput" class="w-full border-2 rounded-xl px-4 py-3 text-base font-mono border-slate-300 focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none" placeholder="請輸入編號 (如: eng01)">
+                <input type="text" id="loginIdInput" class="w-full border-2 rounded-xl px-4 py-3 text-base font-mono border-slate-300 focus:ring-4 focus:ring-slate-200 focus:border-slate-800 focus:outline-none" placeholder="請輸入編號 (如: admin01)">
             </div>
             <div class="mb-6">
                 <label class="block text-base font-bold text-slate-800 mb-1">登入密碼</label>
@@ -283,11 +300,11 @@
         let departments = JSON.parse(localStorage.getItem('departments')) || ['資訊室', '總務科', '政風室', '會計室', '業務一科'];
         let repairs = JSON.parse(localStorage.getItem('repairs')) || [];
 
-        // 🛡️ 閒置超時自動登出設定 (5 分鐘)
+        // 閒置超時自動登出設定 (5 分鐘)
         const INACTIVITY_TIMEOUT = 5 * 60 * 1000;
         let inactivityTimer;
 
-        // 🛡️ 登入失敗記錄與 IP 防護
+        // 登入失敗記錄與 IP 防護
         let loginFailedAttempts = 0;
         let isLoginLocked = false;
 
@@ -318,20 +335,25 @@
             resetInactivityTimer();
         };
 
+        // 抓取雲端帳號 (加入 redirect: "follow" 確保突破 302 重新導向)
         async function fetchAccountsFromCloud() {
             try {
                 if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
-                    const res = await fetch(`${WEB_APP_URL}?action=getAccounts`);
+                    const res = await fetch(`${WEB_APP_URL}?action=getAccounts`, {
+                        method: "GET",
+                        redirect: "follow"
+                    });
                     const data = await res.json();
                     if (Array.isArray(data) && data.length > 0) {
                         staffList = data;
+                        console.log("✅ 成功獲取雲端帳號：", staffList);
                     }
                 }
             } catch (e) {
                 console.error("無法連線至雲端帳號資料，使用備份帳號：", e);
             }
 
-            if (staffList.length === 0) {
+            if (!staffList || staffList.length === 0) {
                 staffList = [
                     { name: '王小明', id: 'user01', pwd: 'user123', role: 'user' },
                     { name: '陳工程師', id: 'eng01', pwd: '1234', role: 'engineer' },
@@ -344,7 +366,10 @@
         async function fetchRepairsFromCloud() {
             try {
                 if (WEB_APP_URL && !WEB_APP_URL.includes('你的部署ID')) {
-                    const res = await fetch(WEB_APP_URL);
+                    const res = await fetch(WEB_APP_URL, {
+                        method: "GET",
+                        redirect: "follow"
+                    });
                     const data = await res.json();
                     if (Array.isArray(data) && data.length > 0) {
                         repairs = data;
@@ -586,7 +611,7 @@
                     <div class="flex justify-between items-center bg-white/90 p-4 rounded-xl border border-rose-200 shadow-sm">
                         <div class="text-base">
                             <span class="font-black text-rose-700 mr-2">[${r.id}]</span>
-                            <span class="font-bold text-slate-800">${r.dept} - ${r.name}</span>
+                            <span class="font-bold text-slate-800">${r.dept} - ${r.name} ${r.ext ? `<span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-mono">分機:${r.ext}</span>` : ''}</span>
                             <span class="text-sm text-slate-600 block mt-1">${r.asset}：${r.desc}</span>
                         </div>
                         <button onclick="openProcessModal('${r.id}')" class="bg-rose-700 hover:bg-rose-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-sm">立即處理</button>
@@ -611,7 +636,6 @@
             `).join('');
         }
 
-        // 👥 渲染人員清單（包含移除按鈕）
         function renderStaff() {
             const staffListEl = document.getElementById('staffList');
             if (!staffListEl) return;
@@ -633,7 +657,6 @@
             }).join('');
         }
 
-        // 🗑️ 從雲端試算表刪除人員帳號
         async function deleteStaffFromCloud(id, name) {
             if (id === currentUserId) {
                 alert('⚠️ 無法刪除目前正在登入使用的管理員帳號！');
@@ -706,8 +729,10 @@
             }
         }
 
+        // 送出報修單 (含分機驗證與包裝)
         async function handleRepairSubmit(e) {
             e.preventDefault(); 
+            
             const nameInput = document.getElementById('userName');
             const name = nameInput.value.trim();
             const chineseNameRegex = /^[\u4e00-\u9fa5]{2,5}$/;
@@ -718,6 +743,17 @@
                 return; 
             }
 
+            // 分機號碼檢查 (3 至 6 碼數字)
+            const extInput = document.getElementById('userExt');
+            const ext = extInput.value.trim();
+            const extRegex = /^[0-9]{3,6}$/;
+
+            if (!extRegex.test(ext)) {
+                alert('⚠️ 分機格式錯誤：請輸入 3 至 6 碼數字！');
+                extInput.focus();
+                return;
+            }
+
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.innerText = "⏳ 正在傳送至 Google 試算表...";
             submitBtn.disabled = true;
@@ -726,6 +762,7 @@
                 id: 'R' + Date.now().toString().slice(-6),
                 date: new Date().toLocaleString(),
                 name: name,
+                ext: ext, // 新增分機欄位
                 dept: document.getElementById('userDept').value,
                 asset: document.getElementById('assetId').value,
                 desc: document.getElementById('repairDesc').value,
@@ -763,6 +800,7 @@
             }
         }
 
+// 報修清單渲染 (含分機顯示與防折行優化)
         function renderRepairs() {
             const tbody = document.getElementById('repairTableBody');
             const filter = document.getElementById('statusFilter').value;
@@ -773,45 +811,53 @@
             }
 
             if (filteredRepairs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-500 font-bold text-lg">目前無符合條件的報修紀錄</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-500 font-bold text-lg">目前無符合條件的報修紀錄</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = filteredRepairs.map(r => {
+                // 🌟 1. 狀態標籤加上 whitespace-nowrap 避免字體折行變形
                 let statusBadge = '';
                 if (r.status === '待處理') {
-                    statusBadge = `<span class="px-4 py-1.5 rounded-full text-sm font-black bg-rose-100 text-rose-800 border border-rose-300">🔴 待處理</span>`;
+                    statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-rose-100 text-rose-800 border border-rose-300 whitespace-nowrap">🔴 待處理</span>`;
                 } else if (r.status === '處理中') {
-                    statusBadge = `<span class="px-4 py-1.5 rounded-full text-sm font-black bg-amber-100 text-amber-800 border border-amber-300">🟡 處理中</span>`;
+                    statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800 border border-amber-300 whitespace-nowrap">🟡 處理中</span>`;
                 } else if (r.status === '已完修') {
-                    statusBadge = `<span class="px-4 py-1.5 rounded-full text-sm font-black bg-emerald-100 text-emerald-800 border border-emerald-300">🟢 已完修</span>`;
+                    statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-300 whitespace-nowrap">🟢 已完修</span>`;
                 } else {
-                    statusBadge = `<span class="px-4 py-1.5 rounded-full text-sm font-black bg-slate-200 text-slate-700 border border-slate-300">${r.status}</span>`;
+                    statusBadge = `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-slate-200 text-slate-700 border border-slate-300 whitespace-nowrap">${r.status}</span>`;
                 }
 
+                // 🌟 2. 操作按鈕加上 flex-nowrap 與 whitespace-nowrap 確保水平並排
                 let actionButtons = '';
                 if (currentRole === 'engineer') {
-                    actionButtons = `<button onclick="openProcessModal('${r.id}')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-md transition">處理/更新</button>`;
+                    actionButtons = `<button onclick="openProcessModal('${r.id}')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-3 py-1.5 rounded-lg text-xs shadow-sm transition whitespace-nowrap">處理/更新</button>`;
                 } else if (currentRole === 'admin') {
                     actionButtons = `
-                        <div class="flex justify-center gap-2">
-                            <button onclick="openProcessModal('${r.id}')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-md transition">處理</button>
-                            <button onclick="deleteRepair('${r.id}')" class="bg-rose-700 hover:bg-rose-800 text-white font-bold px-4 py-2 rounded-xl text-sm shadow-md transition">刪除</button>
+                        <div class="flex items-center justify-center gap-1.5 flex-nowrap">
+                            <button onclick="openProcessModal('${r.id}')" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-2.5 py-1.5 rounded-lg text-xs shadow-sm transition whitespace-nowrap">處理</button>
+                            <button onclick="deleteRepair('${r.id}')" class="bg-rose-700 hover:bg-rose-800 text-white font-bold px-2.5 py-1.5 rounded-lg text-xs shadow-sm transition whitespace-nowrap">刪除</button>
                         </div>
                     `;
                 } else {
-                    actionButtons = `<span class="text-slate-500 text-sm font-bold">僅供檢視</span>`;
+                    actionButtons = `<span class="text-slate-400 text-xs font-medium whitespace-nowrap">僅供檢視</span>`;
                 }
 
                 return `
-                    <tr class="hover:bg-slate-200/50 transition">
-                        <td class="p-4 sm:p-5 text-sm text-slate-500"><span class="font-mono text-slate-900 font-bold block text-base">${r.id}</span>${r.date}</td>
-                        <td class="p-4 sm:p-5 font-bold text-slate-900 text-base">${r.dept}<br><span class="text-sm font-normal text-slate-600">${r.name}</span></td>
-                        <td class="p-4 sm:p-5 font-mono text-base font-bold text-slate-800">${r.asset}</td>
-                        <td class="p-4 sm:p-5 text-slate-900 font-medium">${r.desc}</td>
-                        <td class="p-4 sm:p-5">${statusBadge}</td>
-                        <td class="p-4 sm:p-5 text-sm text-slate-700 font-medium">${r.processLog}</td>
-                        <td class="p-4 sm:p-5 text-center">${actionButtons}</td>
+                    <tr class="hover:bg-slate-100/70 transition">
+                        <td class="p-3.5 text-xs text-slate-500 whitespace-nowrap">
+                            <span class="font-mono text-slate-900 font-bold block text-sm">${r.id}</span>
+                            ${r.date.split('GMT')[0]}
+                        </td>
+                        <td class="p-3.5 font-bold text-slate-900 text-sm whitespace-nowrap">
+                            ${r.dept}<br><span class="text-xs font-normal text-slate-600">${r.name}</span>
+                        </td>
+                        <td class="p-3.5 font-mono text-sm font-bold text-blue-900 whitespace-nowrap">${r.ext || '-'}</td>
+                        <td class="p-3.5 font-mono text-sm font-bold text-slate-800 whitespace-nowrap">${r.asset}</td>
+                        <td class="p-3.5 text-slate-900 font-medium text-sm max-w-xs break-words">${r.desc}</td>
+                        <td class="p-3.5 whitespace-nowrap">${statusBadge}</td>
+                        <td class="p-3.5 text-xs text-slate-600 font-medium max-w-xs break-words">${r.processLog}</td>
+                        <td class="p-3.5 text-center whitespace-nowrap">${actionButtons}</td>
                     </tr>
                 `;
             }).join('');
